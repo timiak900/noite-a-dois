@@ -1,0 +1,1243 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Noite a Dois">
+<meta name="theme-color" content="#0d1430"><meta name="robots" content="noindex,nofollow"><link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
+<style>*,*::before,*::after{box-sizing:border-box}html{height:100%;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);background:#0d1430;color-scheme:dark;-webkit-text-size-adjust:100%}body{margin:0;height:100%;font:14px system-ui,-apple-system,sans-serif;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;overscroll-behavior:none}input,textarea{-webkit-user-select:text;user-select:text}img{max-width:100%}[hidden]{display:none!important}</style>
+</head><body>
+<title>Noite a Dois</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Outfit:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one-column phone app. Mode toggle, scoreboard, one tile-framed play card, actions underneath. Single dark look. */
+:root{
+  --night:#0d1430; --night2:#151e45; --line:#26346f; --tile:#2c55b8;
+  --port:#c7305e; --cream:#f4ebd9; --ink:#141a35; --gold:#eab14b; --muted:#9aa6cf; --good:#3fae7a; --paper2:#d8cfbd; --pinkish:#ff7aa2;
+  --display:"Young Serif",Georgia,serif; --body:"Outfit",system-ui,-apple-system,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--night);color:var(--cream);font-family:var(--body);font-size:16px;background-image:radial-gradient(circle at 50% -10%, rgba(199,48,94,.22), transparent 55%);}
+html,body{overflow:hidden}
+.shell{display:flex;height:100%;min-height:0}
+.main{flex:1;min-width:0;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.wrap{max-width:var(--wrap,560px);margin:0 auto;padding-inline:16px;padding-block:14px 32px;display:flex;flex-direction:column;gap:14px}
+h1{font-family:var(--display);font-weight:400;font-size:1.9rem;margin:0}
+h1 span{color:var(--port)}
+h2{font-family:var(--display);font-weight:400;font-size:1.3rem;margin:0}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.lbl{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+button{font-family:var(--body);cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.btn{border:none;border-radius:12px;padding:14px 12px;font-weight:600;font-size:1rem}
+.go{background:var(--gold);color:var(--ink)}
+.red{background:var(--port);color:var(--cream)}
+.ghost{background:var(--night2);color:var(--cream);border:1px solid var(--line)}
+.small{padding:8px 12px;font-size:.85rem;border-radius:10px}
+.w100{width:100%}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stack{display:flex;flex-direction:column;gap:10px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field input[type=text],.field textarea{background:var(--night2);border:1px solid var(--line);color:var(--cream);border-radius:10px;padding:11px 12px;font:500 1rem var(--body);width:100%;min-width:0}
+.field textarea{min-height:110px;resize:vertical;font-weight:400;font-size:.95rem}
+.seg{display:flex;background:var(--night2);border-radius:12px;padding:4px;gap:4px}
+.seg button{flex:1;border:none;background:none;color:var(--muted);font-weight:600;padding:9px 4px;border-radius:9px;font-size:.92rem}
+.seg button[aria-pressed=true]{background:var(--cream);color:var(--ink)}
+.seg.big button{padding:12px 4px;font-size:1rem}
+.seg.big button[aria-pressed=true]{background:var(--port);color:var(--cream)}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chips button{border:1px solid var(--line);background:transparent;color:var(--muted);padding:7px 11px;border-radius:999px;font-weight:500;font-size:.85rem}
+.chips button[aria-pressed=true]{background:var(--tile);border-color:var(--tile);color:var(--cream)}
+.chips.hot button[aria-pressed=true]{background:var(--port);border-color:var(--port)}
+.chips.afro button[aria-pressed=true]{background:#c9782f;border-color:#c9782f}
+.chips.fight button[aria-pressed=true]{background:#3a8f6a;border-color:#3a8f6a}
+.ghead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.link{background:none;border:none;color:var(--muted);font-size:.8rem;text-decoration:underline;padding:2px 0}
+.note{color:var(--muted);font-size:.86rem;line-height:1.45;margin:0}
+details{background:var(--night2);border:1px solid var(--line);border-radius:12px;padding:12px}
+details summary{cursor:pointer;font-weight:600}
+details.deck{border-color:var(--port)}
+details.deck .dc{display:block;font-weight:400;font-size:.8rem;color:var(--muted);margin-top:2px}
+details[open] summary{margin-bottom:10px}
+
+.board{background:var(--night2);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.brow{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:14px;padding:10px 14px;font-variant-numeric:tabular-nums}
+.brow+.brow{border-top:1px solid var(--line)}
+.nm{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.nm i{width:8px;height:8px;border-radius:50%;background:transparent;flex:0 0 auto}
+.brow.turn .nm i{background:var(--gold)}
+.g{font-family:var(--display);font-size:1.6rem;min-width:1.2em;text-align:right;color:var(--gold)}
+.pips{display:flex;gap:4px}
+.pips b{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--muted)}
+.pips b.on{background:var(--cream);border-color:var(--cream)}
+.bhead{display:grid;grid-template-columns:1fr auto auto;gap:14px;padding:8px 14px 0;font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.bank{padding:8px 14px;border-top:1px solid var(--line);font-size:.8rem;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.bank b{color:var(--pinkish)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+.card{border-radius:18px;padding:12px;background:var(--tile);background-image:radial-gradient(circle at 0 0,transparent 9px,rgba(255,255,255,.18) 10px 12px,transparent 13px),radial-gradient(circle at 100% 100%,transparent 9px,rgba(255,255,255,.18) 10px 12px,transparent 13px),linear-gradient(45deg,rgba(255,255,255,.08) 25%,transparent 25% 75%,rgba(255,255,255,.08) 75%);background-size:28px 28px}
+.inner{background:var(--cream);color:var(--ink);border-radius:10px;min-height:220px;padding:20px 18px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;text-align:center}
+.inner.flip{animation:flip .35s ease}
+@keyframes flip{from{transform:rotateX(70deg);opacity:.3}to{transform:none;opacity:1}}
+.kick{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:#8e1d41;font-weight:700}
+.big{font-family:var(--display);font-size:1.45rem;line-height:1.3;margin:0;text-wrap:balance}
+.huge{font-family:var(--display);font-size:2.3rem;line-height:1.1;margin:0}
+.hint{font-size:.88rem;color:#4b5375;line-height:1.4;margin:0}
+.timer{font-family:var(--display);font-size:2.6rem;font-variant-numeric:tabular-nums}
+.timer.low{color:var(--port)}
+.blur{filter:blur(9px);user-select:none;cursor:pointer}
+.dice{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.die{background:var(--ink);color:var(--cream);border-radius:12px;padding:10px 12px;font-weight:600;min-width:88px}
+.die small{display:block;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:2px}
+.tal{display:flex;gap:18px;justify-content:center;font-weight:600;font-variant-numeric:tabular-nums}
+.tal b{font-family:var(--display);font-size:1.8rem;font-weight:400;display:block}
+.cd{font-family:var(--display);font-size:2.4rem;min-height:1.2em;color:var(--port)}
+.fz{font-family:var(--display);font-size:2.8rem;color:var(--port);min-height:1.1em}
+.pcard{width:84px;height:118px;border-radius:10px;background:#fff;border:2px solid var(--ink);display:grid;place-items:center;font-family:var(--display);font-size:2.2rem}
+.pcard.redsuit{color:var(--port)}
+.tick{font-family:var(--display);font-size:2.4rem;animation:tick .5s ease-in-out infinite alternate}
+@keyframes tick{to{transform:scale(1.15)}}
+
+.pick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pick button{background:var(--night2);border:1px solid var(--line);color:var(--cream);border-radius:14px;padding:12px;text-align:left;display:flex;flex-direction:column;gap:3px}
+.pick button.sexy{border-color:rgba(199,48,94,.6)}
+.pick button.afro{border-color:rgba(201,120,47,.7)}
+.pick button.fight{border-color:rgba(58,143,106,.7)}
+.pick button b{font-family:var(--display);font-weight:400;font-size:1rem}
+.pick button span{font-size:.75rem;color:var(--muted);line-height:1.3}
+
+.word{font-family:var(--display);font-size:1.5rem;letter-spacing:.16em;word-break:break-word}
+.lives{display:flex;gap:5px;justify-content:center}
+.lives b{width:14px;height:14px;border-radius:3px;background:var(--port)}
+.lives b.off{background:var(--paper2)}
+.keys{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;width:100%}
+.keys button{border:none;border-radius:7px;padding:9px 0;background:var(--ink);color:var(--cream);font-weight:600;font-size:.9rem}
+.keys button:disabled{opacity:.25}
+.keys button.hit{background:var(--good);opacity:1}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;width:100%;max-width:300px}
+.grid5 button{aspect-ratio:1;border:none;border-radius:7px;background:var(--tile);color:var(--cream);font-size:1.1rem;font-weight:700;max-width:100%}
+.grid5 button.miss{background:var(--paper2);color:#7a7f96}
+.grid5 button.hit{background:var(--port)}
+.grid5 button.sunk{background:var(--ink)}
+.tally{display:flex;gap:16px;font-size:.9rem;font-weight:600;flex-wrap:wrap;justify-content:center}
+.qd{display:flex;flex-direction:column;gap:10px}
+.qd button{border-radius:16px;min-height:150px;font-family:var(--display);font-size:1.5rem;color:var(--cream);background:var(--night2);border:2px solid var(--line);touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.qd button.flipme{transform:rotate(180deg)}
+.qd .sig{text-align:center;font-family:var(--display);font-size:1.6rem;padding:6px}
+.qd.go button{background:var(--good);border-color:var(--good)}
+
+/* board game */
+.bgrid{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));grid-template-rows:repeat(9,minmax(0,1fr));gap:2px;width:100%;aspect-ratio:1;max-width:100%}
+.sq{position:relative;background:var(--night2);border:1px solid var(--line);border-radius:5px;padding:3px 1px 1px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;font-size:.48rem;line-height:1.05;text-align:center;overflow:hidden;min-width:0;word-break:break-word;cursor:pointer;color:var(--cream)}
+.sq.spec{background:color-mix(in srgb,var(--k,#151e45) 24%,var(--night2))}
+.sq .strip{position:absolute;left:0;right:0;top:0;height:4px}
+.sq .lab{margin-top:2px;font-weight:600}
+.sq .ic{font-size:.72rem;line-height:1;color:var(--k,var(--cream))}
+.sq .lvl{font-size:.4rem;letter-spacing:1px;line-height:1}
+.sq.corner{background:#1d2858}
+.sq.corner .lab{color:var(--gold)}
+.sq.o0{background:rgba(64,140,255,.5);border-color:#5aa9ff;box-shadow:0 0 7px rgba(90,169,255,.8)}
+.sq.o1{background:rgba(255,105,170,.45);border-color:#ff7aa2;box-shadow:0 0 7px rgba(255,122,162,.8)}
+.sq.here{outline:2px solid var(--cream);outline-offset:-2px}
+.toks{display:flex;gap:1px;min-height:10px}
+.tok{width:12px;height:12px;border-radius:50%;font-size:.5rem;font-weight:700;display:inline-grid;place-items:center;color:var(--ink);flex:0 0 auto}
+.sq .tok{width:10px;height:10px;font-size:.42rem}
+.tok.t0{background:#5aa9ff}
+.tok.t1{background:var(--pinkish)}
+.tok.me{box-shadow:0 0 0 2px var(--cream)}
+.center{grid-area:2/2/9/9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:6px}
+.logo{font-family:var(--display);font-size:1.3rem;line-height:1}
+.logo span{color:var(--port);font-size:.9rem}
+.dd{display:flex;gap:8px}
+.dd b{width:40px;height:40px;border-radius:9px;background:var(--cream);color:var(--ink);display:grid;place-items:center;font-family:var(--display);font-size:1.3rem}
+.dd.spin b{animation:spin .4s ease}
+@keyframes spin{from{transform:rotate(-200deg) scale(.6)}to{transform:none}}
+.pl{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pc{background:var(--night2);border:2px solid var(--line);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.pc.me{border-color:var(--gold)}
+.ps{font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.ps b{color:var(--cream);font-size:1rem}
+.cl{display:flex;gap:3px;flex-wrap:wrap}
+.cl i{width:14px;height:6px;border-radius:3px;background:var(--line)}
+.cl i.on{background:var(--pinkish)}
+.cash{font-family:var(--display);font-size:1.25rem;color:var(--gold);font-variant-numeric:tabular-nums}
+.bankp{display:flex;flex-direction:column;gap:8px;background:var(--night2);border:1px solid var(--line);border-radius:12px;padding:10px}
+.bankp .btn{flex:1 1 auto}
+.bankp .btn:disabled{opacity:.4}
+.sq.mort{opacity:.45}
+.cbrow{padding:0 14px 10px}
+.cbrow .btn{width:100%}
+.recap .rr{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;align-items:center}
+.recap .rr b{font-family:var(--display);font-weight:400;font-size:1.3rem;text-align:center;color:var(--cream)}
+.recap .rr.head b{font-family:var(--body);font-weight:600;font-size:.85rem;color:var(--gold)}
+.recap .awards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;text-align:center}
+.recap .awards div{background:var(--night);border-radius:10px;padding:10px 6px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.recap .awards b{font-family:var(--display);font-weight:400;font-size:1rem;overflow-wrap:anywhere}
+.gsub a{color:#6a46c9;font-weight:600}
+a.btn{text-decoration:none;display:inline-block}
+.alert.unlock,.alert.remind{background:#6a46c9;color:#fff}
+.alert .btn.gonow{background:var(--cream);color:var(--ink)}
+.lvgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.lvgrid button{display:flex;align-items:center;gap:10px;text-align:left;background:var(--night);border:1px solid var(--line);color:var(--cream);border-radius:10px;padding:8px 10px;min-width:0}
+.lvgrid b{font-family:var(--display);font-weight:400;font-size:1.3rem;min-width:1.4em;color:var(--gold)}
+.lvgrid span{font-size:.78rem;color:var(--muted);line-height:1.2}
+.ckres{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.ckres .note{grid-column:1/-1}
+.cklv{font-family:var(--display);font-size:2rem;color:var(--gold)}
+.cklv small{font-size:.9rem;color:var(--muted)}
+.cutsetup{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:var(--night2);border:1px dashed var(--line);border-radius:12px;padding:12px}
+.cutsetup.open{border:1px solid #a27bff;box-shadow:0 0 12px rgba(162,123,255,.35)}
+.cutsetup>div:first-child{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 180px}
+.testban{background:var(--gold);color:var(--ink);font-weight:700;text-align:center;padding:6px;border-radius:8px;font-size:.85rem;letter-spacing:.06em}
+.cutcard{background:#6a46c9}
+.steps{text-align:left;margin:0;padding-left:18px;font-size:.92rem;line-height:1.5;color:#3b4160}
+.qtxt{cursor:pointer}
+textarea.secret{width:100%;min-height:90px;border-radius:10px;border:1px solid #c9bfae;padding:10px;font:500 1rem var(--body);background:#fff;color:var(--ink);-webkit-text-security:disc}
+.mlist{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:.92rem;line-height:1.45}
+.dg{display:flex;flex-direction:column;gap:4px}
+.dg svg{width:100%;height:auto;background:var(--night);border-radius:10px}
+.addrow{display:flex;gap:8px}
+.addrow input{flex:1;min-width:0;background:var(--night);border:1px solid var(--line);color:var(--cream);border-radius:10px;padding:10px 12px;font:500 1rem var(--body)}
+.dkin.secret{-webkit-text-security:disc}
+.dkchips{display:flex;flex-wrap:wrap;gap:6px}
+.dkchip{display:inline-flex;align-items:center;gap:4px;background:var(--night);border:1px solid var(--line);border-radius:999px;padding:3px 4px 3px 10px;font-size:.7rem;letter-spacing:2px;color:var(--muted)}
+.dkchip.p0{border-color:#5aa9ff;color:#5aa9ff}
+.dkchip.p1{border-color:#ff7aa2;color:#ff7aa2}
+.dkchip button{background:none;border:none;color:var(--muted);font-size:1rem;line-height:1;padding:2px 6px;letter-spacing:0}
+.bkcode{width:100%;min-height:80px;background:var(--night);border:1px solid var(--line);color:var(--muted);border-radius:10px;padding:10px;font:400 .75rem ui-monospace,Menlo,monospace;word-break:break-all;resize:vertical}
+.bknudge{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:rgba(234,177,75,.12);border:1px solid var(--gold);border-radius:12px;padding:10px 12px;font-size:.88rem}
+.bstack,.bcol{display:flex;flex-direction:column;gap:14px;min-width:0}
+.bside{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:899px){.bside{display:flex;flex-direction:column;gap:14px}}
+.nav{flex:0 0 auto;display:flex;flex-direction:column;gap:4px;width:13.5rem;padding:18px 12px;background:var(--night2);border-right:1px solid var(--line);overflow-y:auto}
+.brand{font-family:var(--display);font-size:1.45rem;padding:4px 10px 14px;color:var(--cream)}
+.brand span{color:var(--port)}
+.ntab{position:relative;display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;color:var(--muted);font:600 .95rem var(--body);padding:11px 12px;border-radius:10px;text-align:left}
+.ntab:hover{background:rgba(255,255,255,.04);color:var(--cream)}
+.ntab[aria-current=page]{background:var(--night);color:var(--cream);box-shadow:inset 3px 0 0 var(--port)}
+.nic{width:1.4em;text-align:center;font-size:1.05rem}
+.ndot{width:8px;height:8px;border-radius:50%;margin-left:auto;flex:0 0 auto}
+.ndot.live{background:var(--good);box-shadow:0 0 6px var(--good)}
+.ndot.hot{background:#a27bff;box-shadow:0 0 6px #a27bff}
+.ndot.warn{background:var(--gold)}
+.nscore{margin-top:auto;padding:12px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:3px}
+.nscore b{font-size:.9rem;font-variant-numeric:tabular-nums;color:var(--cream)}
+.ptitle{font-size:1.6rem}
+.panel{background:var(--night2);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.ph{font-family:var(--display);font-weight:400;font-size:1.1rem;margin:0;color:var(--cream)}
+.panel .seg{background:var(--night)}
+.cols{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;align-items:start}
+.cols>.stack{gap:14px}
+.startbox{position:sticky;bottom:0}
+.steps.light{color:var(--cream)}
+@media (min-width:900px){
+  .cols{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .bside .bgrid{width:min(100%,calc(100dvh - 150px));margin-inline:auto}
+}
+@media (max-width:899px){
+  .shell{flex-direction:column}
+  .main{order:1}
+  .nav{order:2;flex-direction:row;width:100%;padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px));border-right:none;border-top:1px solid var(--line);overflow-x:auto;gap:2px}
+  .brand,.nscore{display:none}
+  .ntab{flex:1 1 0;flex-direction:column;gap:2px;padding:7px 2px;font-size:.66rem;text-align:center;min-width:56px}
+  .ntab[aria-current=page]{box-shadow:inset 0 3px 0 var(--port)}
+  .nic{font-size:1.15rem;width:auto}
+  .ndot{position:absolute;top:6px;right:calc(50% - 16px);margin:0}
+  body .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+}
+.jarline{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
+.jarline b{color:var(--pinkish)}
+.log{display:flex;flex-direction:column;gap:3px;font-size:.82rem;color:var(--muted)}
+.log div:first-child{color:var(--cream)}
+
+.over{position:fixed;inset:0;background:rgba(8,12,30,.92);display:flex;align-items:center;justify-content:center;padding:16px;z-index:5}
+.over .box{background:var(--night2);border:1px solid var(--line);border-radius:18px;padding:22px 18px;max-width:520px;width:100%;display:flex;flex-direction:column;gap:14px;max-height:100%;overflow-y:auto}
+.rules h3{font-family:var(--display);font-weight:400;font-size:1.02rem;margin:0;color:var(--gold)}
+.rules p{margin:0;color:var(--cream);font-size:.9rem;line-height:1.5}
+.rules section{display:flex;flex-direction:column;gap:4px}
+.rules h4{margin:8px 0 0;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.rules .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
+.rules ol{margin:0;padding-left:18px;font-size:.88rem;line-height:1.5}
+.gcard{width:100%;max-width:400px;background:var(--cream);color:var(--ink);border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:pop .3s ease;max-height:100%;overflow-y:auto}
+@keyframes pop{from{transform:scale(.8) rotate(-3deg);opacity:0}to{transform:none;opacity:1}}
+.gtop{background:var(--k);color:#fff;padding:14px 18px;display:flex;flex-direction:column;gap:2px}
+.gtop span{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;opacity:.85;font-weight:600}
+.gtop b{font-family:var(--display);font-weight:400;font-size:1.5rem}
+.gbonus{background:#3fae7a;color:#fff;padding:9px 18px;font-weight:600;font-size:.9rem}
+.gtext{font-family:var(--display);font-size:1.2rem;line-height:1.35;padding:18px 18px 8px;margin:0;text-wrap:pretty}
+.gsub{padding:0 18px 12px;margin:0;font-size:.88rem;color:#4b5375;line-height:1.45}
+.gsub ol{margin:4px 0 0;padding-left:18px}
+.gbtns{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;padding:8px 14px 14px}
+.potion{font-size:3rem}
+.alert{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px 16px;text-align:center;cursor:pointer}
+.alert.shot{background:var(--port);color:var(--cream)}
+.alert.drink{background:var(--gold);color:var(--ink)}
+.alert.forfeit{background:#6a46c9;color:#fff}
+.alert .an.big2{font-family:var(--display);font-size:1.6rem;opacity:1;max-width:22ch}
+.pausebtn{min-width:40px}
+.alert .ah{font-family:var(--display);font-size:clamp(3rem,16vw,6rem);line-height:.95;margin:0;animation:thump .7s ease-in-out infinite alternate}
+.alert .aw{font-size:1.6rem;font-weight:700}
+.alert .an{font-size:1rem;opacity:.85;max-width:30ch}
+.alert .btn{min-width:200px;background:var(--ink);color:var(--cream)}
+@keyframes thump{to{transform:scale(1.08)}}
+@media (prefers-reduced-motion:reduce){.alert .ah{animation:none}}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--cream);color:var(--ink);padding:10px 16px;border-radius:999px;font-weight:600;font-size:.9rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){.inner.flip,.dd.spin b,.gcard,.tick{animation:none}}
+</style>
+
+<div class="shell"><nav class="nav" id="nav" aria-label="Sections"></nav><main class="main" id="main"><div class="wrap" id="app"></div></main></div>
+<div id="overlay"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =================== CONTENT =================== */
+const HEATS=["Clean","Flirty","Filthy"];
+const C={
+truth:[
+ ["What was the first thing you noticed about me?","When did you first know you fancied me?","Rate our first kiss out of 10.","What's a habit of mine you secretly love?","What's a compliment you've never said out loud?","What outfit of mine is your favourite?","What's the most romantic thing I've done?","Describe our first date from your side, honestly."],
+ ["What do I wear that you most want to take off me?","Where's the riskiest place you've wanted to kiss me?","Which part of my body is your favourite?","What's something new you want to try this trip?","When did you last think about me in a not-so-innocent way?","What could I whisper that would work every time?","Chasing or being chased?","Describe your perfect night in with me.","What's the sexiest thing I've ever said to you?","What's your favourite photo of me, and why?"],
+ ["What's your wildest fantasy you've never told me?","What do you want me to do to you tonight, step by step?","What's the hottest night we've had?","Rate my skills out of 10 and give one tip.","What have you been too shy to ask me for?","Favourite position, and why?","Where's the riskiest place you'd want to do it?","What's the dirtiest thought you've had about me today?","What do I do that makes you lose it every time?","Lights on or off? Quiet or loud?","What do you want to try in this hotel room?","What's the naughtiest text you almost sent me?","Toy, blindfold or handcuffs: pick one for tonight.","Who's in charge in bed, and should that flip tonight?","What's a turn-on of yours I don't know about?","What's the most daring thing you'd let me do to you?","What's a kink you've never admitted to?","Rate every part of my body out of 10. Go slowly.","What's one thing you want me to do to you that we've never done?","Where on your body do you most want my mouth right now?"]],
+dare:[
+ ["Give your partner a 1-minute shoulder massage.","Slow dance together to the next song.","Hold eye contact for 30 seconds without laughing.","Do your best impression of your partner flirting.","Sit on your partner's lap until your next turn.","Serenade your partner for 20 seconds.","Give three genuine compliments.","Feed your partner a sip of their drink."],
+ ["Kiss your partner's neck for 10 seconds.","Take off one item of clothing (jewellery doesn't count).","Whisper what you want to do later in their ear.","Kiss your partner like the end of a film.","Swap one item of clothing with your partner.","Nibble your partner's ear for 5 seconds.","Let your partner blindfold you and guess where they kiss you.","Take a sip from your partner's collarbone.","Give your partner a 30-second massage anywhere they choose.","Send your partner the flirtiest text you can, right now."],
+ ["Give your partner a 1-minute lap dance.","Take off two items of clothing.","Blindfold your partner and tease them for 1 minute.","Kiss your partner anywhere they point to for 20 seconds.","Run an ice cube anywhere on your partner for 30 seconds.","Let your partner undress you down to whatever they choose.","Whisper exactly what's happening later, in detail.","Your partner gets 2 minutes to do what they want to you.","Take off your underwear and hand it to your partner.","Show your partner how you like to be touched, over clothes.","Kiss your way down from their neck as far as they let you.","Do a 30-second striptease to a song they pick.","Take a body shot from wherever your partner chooses.","Act out your favourite position, clothes on.","Suck your partner's toes for 15 seconds.","Lick a slow line up your partner's neck.","Spank your partner 10 times. They count.","Take a body shot off your partner's bum.","Kiss both of your partner's bum cheeks.","Slow grind on your partner's lap for a full song.","Take off your partner's underwear with your teeth.","Leave a love bite on your partner's inner thigh."]],
+never:[
+ ["Never have I ever stalked my partner's ex online.","Never have I ever pretended to like a gift from my partner.","Never have I ever lied about how many drinks I've had.","Never have I ever fallen asleep on a date.","Never have I ever practised kissing on my hand.","Never have I ever cried at a film and denied it.","Never have I ever texted the wrong person something embarrassing.","Never have I ever faked being sick to skip plans."],
+ ["Never have I ever kissed someone in public and got stares.","Never have I ever sent a spicy photo.","Never have I ever flirted my way out of trouble.","Never have I ever skinny dipped.","Never have I ever had a dream about my partner I couldn't tell them.","Never have I ever been caught making out.","Never have I ever gone out with nothing on underneath.","Never have I ever kissed someone within an hour of meeting them.","Never have I ever picked an outfit just to tease my partner."],
+ ["Never have I ever done it outdoors.","Never have I ever used a toy.","Never have I ever role-played.","Never have I ever done it somewhere we could have been caught.","Never have I ever sent a spicy video.","Never have I ever been tied up.","Never have I ever faked it.","Never have I ever done it in a car.","Never have I ever been walked in on.","Never have I ever watched something spicy to get in the mood.","Never have I ever gone more than three rounds in one night.","Never have I ever made noise loud enough to worry about the neighbours.","Never have I ever thought about it at work and had to sit still.","Never have I ever started it in the middle of the night.","Never have I ever had my toes sucked.","Never have I ever been spanked hard enough to leave a mark."]],
+likely:[
+ ["Who's most likely to get us lost in Portugal?","Who's most likely to cry at the airport?","Who's most likely to fall asleep first tonight?","Who's most likely to overspend on souvenirs?","Who's most likely to dance on a table?","Who's most likely to forget the passports?"],
+ ["Who's most likely to make the first move tonight?","Who's the better kisser?","Who's most likely to send a spicy text at work?","Who's most likely to get jealous first?","Who's most likely to suggest skinny dipping?","Who's most likely to wear something revealing on purpose?"],
+ ["Who's most likely to beg first?","Who's most likely to suggest something wild?","Who's most likely to take charge tonight?","Who's most likely to leave marks?","Who's most likely to want round two?","Who's most likely to break first in a tease-off?","Who's most likely to have packed a toy?","Who's most likely to end this game naked?","Who's louder?","Who's most likely to start it in public?"]],
+know:[
+ ["What's my go-to takeaway order?","What's my biggest pet peeve?","What's my comfort film?","What did I want to be as a kid?","What's my coffee order?","What am I most scared of?","Where's my dream holiday?"],
+ ["What do I love most about your body?","Where do I most like being kissed?","Which outfit of yours drives me mad?","What's my favourite date we've been on?","What song gets me in the mood?","What's the first thing I'd do if you walked in in underwear?"],
+ ["What's my favourite position?","Where's my most sensitive spot?","What's my biggest turn-on?","What's my favourite thing you do to me?","What time of day am I most up for it?","What fantasy would I most want to try?","Toy, blindfold or handcuffs: which would I pick?","What's the hottest night we've had, in my opinion?","What's one word that gets me going instantly?"]],
+blindTool:[["fingertip","nose","hair","a cold glass"],["lips","fingertips","breath","an ice cube"],["lips","tongue","an ice cube","fingertips","teeth (gently)"]],
+blindSpot:[["hand","cheek","forehead","wrist","shoulder","ear"],["neck","ear","collarbone","lips","back","wrist"],["inner thigh","neck","stomach","chest","lower back","behind the knee","hip bone"]],
+kissTool:[["lips","nose (Eskimo kiss)","eyelashes (butterfly kiss)"],["lips","tongue","eyelashes (butterfly kiss)","lips with ice in your mouth"],["lips","tongue","teeth (gently)","lips with ice in your mouth","lips with a sip of warm drink"]],
+flinch:[
+ ["Make them laugh. No tickling.","Pull faces inches from theirs.","Tell your worst jokes."],
+ ["Whisper compliments in their ear.","Kiss their neck slowly.","Trace your fingers along their arm and neck.","Breathe on their neck and ear."],
+ ["Kiss and touch anywhere above the waist.","Lap dance, they can't touch you.","Whisper what you'll do to them later, in detail.","Kiss slowly down their stomach.","Kiss their inner thighs.","Take one item off them, slowly.","Suck their toes."]],
+two:[["your childhood","school days","jobs you've had","holidays"],["exes","first dates","crushes","your first kiss"],["your sex life","your fantasies","the riskiest thing you've done","what you want tonight"]],
+cats:[
+ ["Portuguese foods","Football clubs","Cocktails","Countries in Europe","Things at an airport","Irish counties","Car brands","Beers"],
+ ["Places to kiss someone","Romantic films","Pick-up lines","Things in a hotel room","Sexy outfits","Love songs"],
+ ["Sex positions","Things in a sex shop","Places you'd do it","Body parts you'd kiss","Things to do with whipped cream","Words for 'doing it'","Things that turn you on"]],
+stare:["No rules. First to blink, laugh or look away loses.","Your partner can say anything flirty to break you.","Your partner can whisper anything dirty. No touching."],
+diceA:[["Kiss","Hug","Tickle","Compliment","Massage","Hold"],["Kiss","Nibble","Lick","Massage","Blow on","Caress"],["Kiss","Lick","Nibble","Suck","Tease","Your choice"]],
+diceB:[["Hand","Cheek","Forehead","Shoulders","Back","Nose"],["Neck","Ear","Lips","Collarbone","Stomach","Lower back"],["Neck","Inner thigh","Chest","Lips","Stomach","Toes","Bum","Partner's choice"]],
+diceT:["10 sec","20 sec","30 sec","45 sec","1 min","Until told to stop"],
+charades:[
+ ["Surfing","Brushing your teeth","Riding a horse","Airport security","Lost luggage","Sunburn","Eating a hot chilli","Taking a selfie","Penalty shootout","Stuck in a lift","Doing yoga","Kangaroo","Parallel parking","Hangover"],
+ ["Slow dance","Blowing a kiss","First date nerves","Putting on lipstick","Walk of shame","Checking someone out","Body shots","Skinny dipping","A pick-up line that fails","Bubble bath","Spooning","Love bite"],
+ ["Lap dance","Striptease","Spanking","Handcuffs","The morning after","Getting caught","Pole dancing","Whipped cream","Blindfold","Shower together","A creaky bed","Massage oil","Being quiet at the in-laws'","Undoing a bra one-handed","Doggy style","Reverse cowgirl","Toe sucking"]],
+sentence:[
+ ["The early bird catches the worm","We are going on holiday to Portugal","Can I have the bill please","My suitcase is too heavy","Don't forget the sun cream","Two pints of Guinness please","Our flight has been delayed","It's raining again in Dublin"],
+ ["You look really good tonight","Come here and kiss me","I can't stop looking at you","Let's skip dinner","Room service for two","Meet me in the shower","You owe me a massage","What are you wearing under that"],
+ ["Take it off slowly","Not in front of the neighbours","Lock the door","I've been thinking about this all day","Leave the heels on","Don't make me wait","The bed is too loud","Tie me up","Round two in five minutes","Do that again","Get on your knees","I'm not wearing any underwear"]],
+hang:[
+ ["PASSPORT","SUNSHINE","LISBON","ALGARVE","COCKTAIL","SUITCASE","PASTEL DE NATA","SANGRIA","SUNGLASSES","SWIMMING POOL"],
+ ["LIPSTICK","BIKINI","SEDUCTION","MASSAGE","FLIRTING","CANDLELIGHT","CHAMPAGNE","SKINNY DIPPING","LOVE BITE"],
+ ["HANDCUFFS","BLINDFOLD","LINGERIE","STRIPTEASE","FOREPLAY","LAP DANCE","WHIPPED CREAM","ROLE PLAY","SPANKING","ROUND TWO","QUICKIE","WALK OF SHAME","TOE SUCKING"]]
+};
+const TRUST=["Have you ever seriously thought about leaving me? When, and what stopped you?","What's one thing I do that genuinely makes you question us?","Have you ever lied to me about something that actually mattered? What was it?","What's something from your past you've never told me because you're scared of how I'd react?","Rate how much you trust me out of 10. What would it take to make it a 10?","Have you ever gone through my phone, or wanted to? What were you looking for?","Since we got together, has anyone made you feel something you felt guilty about?","What's the worst thing I've ever said to you that you still haven't let go of?","What's a dealbreaker you've come close to hitting with me?","What do you honestly think is the weakest part of our relationship?","Have you ever compared me to an ex? Who came out better, and on what?","When was the last time you felt lonely while we were together?","What's something you pretend not to mind that actually bothers you a lot?","Is there anyone in my life you secretly don't trust around me?","If you could change one thing about me with no consequences, what would it be?","What's a fear about our future you've never said out loud?","Have you ever stayed quiet in an argument just to keep the peace, when you really thought I was wrong? About what?","What's something you need from me that you've stopped asking for?","If we broke up tomorrow, what would you miss least?","What's one secret you're still keeping from me right now?"];
+const GK=[["What's the capital of Portugal?","Lisbon"],["Which river runs through Porto?","The Douro"],["What's the famous Portuguese custard tart called?","Pastel de nata"],["Which ocean is west of Portugal?","Atlantic"],["Which explorer sailed from Portugal to India in 1498?","Vasco da Gama"],["What language is spoken in Brazil?","Portuguese"],["How many sides does a hexagon have?","6"],["What's the largest planet in our solar system?","Jupiter"],["What's the chemical symbol for gold?","Au"],["Which country hosted the 2022 World Cup?","Qatar"],["Who painted the Mona Lisa?","Leonardo da Vinci"],["What's the capital of Australia?","Canberra"],["What's the smallest prime number?","2"],["What's the longest river in Africa?","The Nile"],["How many hearts does an octopus have?","3"],["Which planet is called the Red Planet?","Mars"],["What year did Ireland join the EEC?","1973"],["What's the capital of Canada?","Ottawa"],["How many bones are in the adult human body?","206"],["What gas do plants take in from the air?","Carbon dioxide"],["Who wrote Romeo and Juliet?","Shakespeare"],["What's the fastest land animal?","Cheetah"],["How many minutes are in a day?","1,440"],["What's the largest ocean?","Pacific"],["Which country is Machu Picchu in?","Peru"],["What's the capital of Northern Ireland?","Belfast"],["What's a baby kangaroo called?","A joey"],["How many continents are there?","7"],["Which Premier League club is called the Gunners?","Arsenal"],["Which country gave the USA the Statue of Liberty?","France"],["How many days are in a leap year?","366"],["What's the currency of Japan?","Yen"],["What's the capital of Nigeria?","Abuja"],["What's the capital of Ghana?","Accra"],["What's the largest country in Africa by area?","Algeria"]];
+const SPELL=["necessary","accommodate","rhythm","conscientious","entrepreneur","Mediterranean","embarrass","millennium","occasionally","questionnaire","liaison","bureaucracy","definitely","separate","supersede","onomatopoeia","mischievous","privilege","Caribbean","manoeuvre","colleague","hygiene","Portuguese","pronunciation","cemetery","conscience","fluorescent","guarantee","harass","lieutenant","perseverance","receipt","silhouette","champagne","aphrodisiac","lingerie","rendezvous","voluptuous","titillate","promiscuous"];
+const AFRO=[["Essence","Wizkid ft. Tems"],["Last Last","Burna Boy"],["Calm Down","Rema"],["Ye","Burna Boy"],["Fall","Davido"],["Unavailable","Davido ft. Musa Keys"],["Joro","Wizkid"],["Ojuelegba","Wizkid"],["Rush","Ayra Starr"],["Love Nwantiti","CKay"],["Peru","Fireboy DML"],["Free Mind","Tems"],["Water","Tyla"],["Sungba","Asake"],["Terminator","Asake"],["Bloody Samaritan","Ayra Starr"],["Dumebi","Rema"],["If","Davido"],["Assurance","Davido"],["Come Closer","Wizkid ft. Drake"],["On the Low","Burna Boy"],["Johnny","Yemi Alade"],["Duduke","Simi"],["Ginger","Wizkid ft. Burna Boy"],["Gbona","Burna Boy"],["Anybody","Burna Boy"],["Mood","Wizkid ft. BNXN"],["Feel","Davido"],["Lonely at the Top","Asake"],["Charm","Rema"],["Commas","Ayra Starr"],["Buga","Kizz Daniel ft. Tekno"],["African Queen","2Baba"],["Pana","Tekno"],["Kilometre","Burna Boy"],["Fem","Davido"],["Godly","Omah Lay"],["Understand","Omah Lay"],["Bandana","Fireboy DML & Asake"],["Joha","Asake"],["Electricity","Pheelz & Davido"],["Finesse","Pheelz ft. BNXN"],["Soweto","Victony"],["Holy Ghost","Omah Lay"],["Ku Lo Sa","Oxlade"]];
+const AFROCATS=["Davido songs","Wizkid songs","Burna Boy songs","Asake songs","Rema songs","Afrobeats artists","Female Afrobeats artists","Afrobeats songs with a dance","Nigerian foods","Ghanaian artists","African countries","Afrobeats songs about love"];
+const BOMBCATS=["Afrobeats artists","Things in a bedroom","Cocktails","Footballers","Sexy words","Things you can lick","Portuguese cities","Body parts","Pizza toppings","Things that vibrate","Things you'd find in a hotel","Nigerian foods","Rappers","Things you say in bed"];
+const SIMON=["touch your toes","kiss my neck","take off one sock","spin around twice","blow me a kiss","bite your lip","slap your own bum","sit on my lap","take your top off","whisper something dirty","stand up","close your eyes for 5 seconds","kiss my hand","do a body roll","lick your lips slowly","say my name, sexy","kiss my inner wrist","do 5 squats","give me a lap dance for 10 seconds","take off one item","kiss my belly","give me a slow wink","suck my finger"];
+const DRAW=["Kiss","Heart","Lips","Bed","Wine","Sun","Beach","Love","Sexy","Naked","Lisbon","Bum","Shower","Tongue","Lick","Candle","Ice","Hotel","Party","Toes","Spank","Booty","Moan","Whip","Afro"];
+const HOTCOLD=["left ear","belly button","right hip bone","back of the neck","inner left thigh","lower back","left ankle","right wrist","collarbone","behind the right knee","bum","left nipple","right big toe","lips"];
+const TOES=["left big toe","left second toe","left little toe","right big toe","right middle toe","right little toe"];
+const KSPOT=["neck","inner wrist","collarbone","cheek","earlobe","belly button","inner thigh","lower back","shoulder","ankle","hip bone","lips"];
+const KROUL=["Neck","Lips","Earlobe","Collarbone","Chest","Belly button","Inner thigh","Lower back","Toes","Bum","Hip bone","Behind the knee","Fingertips","Partner's choice"];
+const SHOTSPOT=["belly button","collarbone","neck","lower back","inner thigh","chest","bum","hip bone","their lips (pass it mouth to mouth)","ankle"];
+const ICEPATH=["neck to belly button","lips to collarbone","ankle to knee","ear to ear","chest to hip bone","inner wrist to shoulder","lower back to the back of the neck"];
+const STAKES=["Drink","Take off one item","Give a 20-second lap dance","Suck their toes for 10 seconds","Body shot off wherever they choose","Take 5 spanks","Kiss them anywhere they choose"];
+const MOVES=["Jab","Cross","Hook","Uppercut","Duck","Slip left","Slip right","Block","Body shot","Weave"];
+
+const GROUPS=[["sexy","Sexy"],["afro","Afrobeats"],["fight","Fight night"],["party","Party"]];
+const GAMES={
+ trust:{g:"sexy",name:"Trust Test",short:"Extreme relationship truths",rule:"The hardest truths about your relationship. Answer honestly and you win the point. Won't answer? Take a shot, and your partner gets the point. No getting angry at the answers, that's the rule."},
+ truth:{g:"sexy",name:"Truth or Drink",short:"Answer or drink",rule:"Answer honestly and you win the point. Won't answer? Drink, and your partner gets the point."},
+ dare:{g:"sexy",name:"Dare or Drink",short:"Do it or drink",rule:"Do the dare properly and you win the point. Chicken out? Drink, and your partner gets the point."},
+ never:{g:"sexy",name:"Never Have I Ever",short:"Guilty drinks",rule:"Anyone who's done it drinks. If only one of you is guilty, the innocent one gets the point. Both or neither: next card."},
+ dice:{g:"sexy",name:"Sexy Dice",short:"Action, spot, time",rule:"Roll for an action, a spot and a time. Do it to your partner and you win the point. Refuse, drink, and they get it."},
+ likely:{g:"sexy",name:"Most Likely To",short:"Point on three",rule:"On three, both point at who it is. Agree? The guilty one drinks and the other gets the point. Disagree? Both drink, next card."},
+ know:{g:"sexy",name:"How Well Do You Know Me",short:"Answer about your partner",rule:"You answer the question about your partner. They say if you're right. Right: your point. Wrong: theirs."},
+ blind:{g:"sexy",name:"Blindfold Guess",short:"Guess where you were touched",rule:"Eyes closed. Your partner touches you how the card says. Guess the spot. Right: your point. Wrong: theirs."},
+ gkiss:{g:"sexy",name:"Guess the Kiss",short:"What did they kiss you with?",rule:"Eyes closed. Your partner kisses you with something, somewhere. Guess both the what and the where. Get both: your point. Miss either: theirs."},
+ flinch:{g:"sexy",name:"Don't Flinch",short:"Survive the tease",rule:"Your partner teases you for 60 seconds. Stay still and silent. Moan, laugh, move or touch back and they win. Survive and it's yours."},
+ freeze:{g:"sexy",name:"Freeze",short:"Hold still when it says freeze",rule:"Your partner teases you for 60 seconds. When the screen shouts FREEZE, you can't move until it clears. Move and you lose an item and the point. Hold out and you win."},
+ hotcold:{g:"sexy",name:"Hot or Cold",short:"Find the secret spot",rule:"Eyes closed. Your partner sees a body part and guides you with 'hot' or 'cold'. Kiss the right spot within 60 seconds and you don't drink, and you get the point. Run out of time and you drink."},
+ toetap:{g:"sexy",name:"Toe Tap",short:"Which toe was it?",rule:"Eyes closed. Your partner touches one of your toes. Name the toe. Right: your point. Wrong: they win the point and suck that toe."},
+ draw:{g:"sexy",name:"Draw on My Back",short:"Guess what they traced",rule:"The drawer traces the word on the guesser's back with a finger. Guess it right and the drawer drinks. Get it wrong and you drink. Whoever doesn't drink gets the point."},
+ simon:{g:"sexy",name:"Sexy Simon Says",short:"Only when Simon says",rule:"Your partner reads you 5 commands. Only do the ones that start with 'Simon says'. Do one without it, or miss a Simon one, and you lose the point and drink. Survive all 5 and you win."},
+ kroul:{g:"sexy",name:"Kiss Roulette",short:"Spin, then kiss it",rule:"Spin for a body part and a time. Kiss your partner there for that long and you win the point. Refuse, drink, and they get it."},
+ sroul:{g:"sexy",name:"Body Shot Roulette",short:"Spin for the spot",rule:"Spin to see where you take a body shot off your partner. Do it: your point. Refuse: drink anyway, and the point is theirs."},
+ ice:{g:"sexy",name:"Ice Cube Relay",short:"Mouth to mouth, don't drop it",rule:"Pass an ice cube mouth to mouth along the path on the card, across each other's bodies. Whoever drops it loses the point and drinks."},
+ strivia:{g:"sexy",name:"Strip Trivia",short:"Wrong answer, item off",rule:"Answer the quiz question. Right: your point. Wrong: your partner gets the point and you take an item off."},
+ two:{g:"sexy",name:"Two Truths & a Lie",short:"Spot the lie",rule:"Say three things about the topic: two true, one lie. Your partner guesses the lie. Caught: their point. Fooled: your point."},
+ stare:{g:"sexy",name:"Staring Contest",short:"First to break loses",rule:"Lock eyes. First to blink, laugh or look away loses. The card says what your partner can do to break you."},
+ lapdance:{g:"sexy",name:"Lap Dance Battle",short:"One song each, scored",rule:"One song each. Give your partner your best lap dance. They score you out of 10. Higher score wins. Tie: both drink."},
+ hook:{g:"afro",name:"Finish the Hook",short:"Sing the next line",rule:"You see a song and artist. Sing the hook or the next line from memory. Your partner checks it on their phone. Right: your point. Wrong: drink, and the point is theirs."},
+ tune:{g:"afro",name:"Name That Tune",short:"5 seconds to guess",rule:"The DJ sees a song and plays the first 5 seconds on Spotify. The guesser names it within 10 seconds. Got it: guesser's point. Missed: DJ's point and the guesser drinks."},
+ whosang:{g:"afro",name:"Who Sang It",short:"Name the artist",rule:"A song title appears. First to shout the artist wins the point. Wrong shout gives it to your partner."},
+ afrocats:{g:"afro",name:"Afro Categories",short:"Name them till you freeze",rule:"Take turns naming things in the Afrobeats category. 5 seconds each. Freeze, repeat or get it wrong and you lose the point."},
+ rps:{g:"fight",name:"Rock Paper Scissors",short:"Best of 3, with stakes",rule:"Hands out. Tap Shoot for the countdown. Each hand has a stake, and the loser of that hand does it. You can double the stake before a hand. First to 2 hands wins the point. There's also a running tally for the whole night."},
+ look:{g:"fight",name:"Look Away",short:"The Korean pointing game",rule:"Play rock paper scissors. The winner points up, down, left or right on 'LOOK!' while the other turns their head. Match their direction and you catch them. First to 3 catches wins."},
+ combo:{g:"fight",name:"Combo Caller",short:"Throw the combo",rule:"Throw the combo on screen at your partner, shadowboxing. They judge. Each combo you nail, the next gets longer. Mess up and you drink. Your partner then tries to beat your streak."},
+ slap:{g:"fight",name:"Slap Hands",short:"Pull away in time",rule:"Hands on top of your partner's, palms down. The bottom person tries to slap the top hands. Each slap or each flinch counts. First to 3 wins the point."},
+ thumb:{g:"fight",name:"Strip Thumb War",short:"Every pin, item off",rule:"Thumb war. Every pin is an item off for the loser. First to 2 pins wins the point."},
+ quick:{g:"party",name:"Quick Draw",short:"Fastest thumb wins",rule:"Phone flat between you, one thumb each. Wait for green, then hit your button. Tap early and you lose."},
+ bomb:{g:"party",name:"Bomb",short:"Don't be holding it",rule:"Name something in the category, then tap Pass and hand the phone over. The bomb has a hidden timer. Whoever's holding it when it goes off loses the point and drinks."},
+ hilo:{g:"party",name:"Higher or Lower",short:"Beat your partner's streak",rule:"Guess if the next card is higher or lower. Keep going until you're wrong, then drink. Your partner then tries to beat your streak. Longer streak wins. Same card is a free pass."},
+ cats:{g:"party",name:"Categories",short:"Don't run out",rule:"Take turns naming things in the category. 5 seconds each. Freeze, repeat or get it wrong and you lose."},
+ charades:{g:"party",name:"Charades",short:"Act it out, no talking",rule:"The actor sees the word and acts it. No talking, no sounds. The guesser has 60 seconds. Guess it: guesser wins. Time's up: actor wins. Actor must try properly, or drink."},
+ sentence:{g:"party",name:"Guess the Sentence",short:"Describe it, don't say it",rule:"The describer explains the sentence without saying any word in it. The guesser has 90 seconds. Got it: guesser wins. Time's up: describer wins. Say a banned word and you lose."},
+ maths:{g:"party",name:"Maths",short:"Fastest right answer",rule:"First to shout the right answer wins. Shout a wrong one and your partner wins."},
+ gk:{g:"party",name:"General Knowledge",short:"Quiz race",rule:"First to shout the right answer wins. Wrong shout gives your partner the point."},
+ spell:{g:"party",name:"Spelling Bee",short:"Read it, spell it",rule:"The reader reads the word out. The speller spells it out loud, one go. Right: speller wins. Wrong: reader wins. UK spelling."},
+ hang:{g:"party",name:"Hangman",short:"6 lives",rule:"Guess letters. Six wrong and you're hanged. Solve it and you win the point. Hanged: your partner wins."},
+ ship:{g:"party",name:"Battleship",short:"Sink 2 of 3 ships",rule:"Three ships hide on the grid. Take turns firing. Hit and you go again. Land the final shot on a ship to sink it. Sink 2 and you win."}
+};
+const ORDER=Object.keys(GAMES);
+const inGroup=g=>ORDER.filter(k=>GAMES[k].g===g);
+
+/* board */
+const GRP={brown:"#9b6a4a",lblue:"#7fc3e8",pink:"#e58fb0",orange:"#e8954a",green:"#3fae7a",dblue:"#4a7be0",royal:"#a23bd6"};
+const GRPNAME={brown:"Brown",lblue:"Light blue",pink:"Pink",orange:"Orange",green:"Green",dblue:"Dark blue",royal:"Royal (the VIP set)"};
+const BASE={brown:10,lblue:15,pink:15,orange:20,green:25,dblue:30,royal:30};
+const P=(l,s,g,part,v)=>({t:"p",l,s,g,part,v});
+const X=(t,l,s,i)=>({t,l,s,i});
+const SQ=[
+ X("go","GO","GO","➜"),P("Fingertip Lane","Fingertip Ln","brown","fingers",["Kiss their fingertips for {t} seconds","Suck their fingers one by one"]),X("chance","Chance","Chance","?"),
+ P("Wrist Way","Wrist Way","brown","wrists",["Kiss their wrists for {t} seconds","Kiss slowly from their wrist up to their neck"]),X("strip","Strip Tax","Strip Tax","✂"),
+ P("Toe Street","Toe St","lblue","toes",["Massage their feet for {t} seconds","Suck their toes for {t} seconds"]),X("spank","Spank Station","Spank","✋"),
+ P("Ankle Avenue","Ankle Ave","lblue","ankles",["Kiss their ankles for {t} seconds","Kiss from their ankle up to their knee"]),
+ X("jail","Jail","Jail","▦"),
+ P("Behind-the-Knee Close","Knee Close","lblue","knees",["Kiss behind their knees for {t} seconds","Lick behind their knees for {t} seconds"]),X("truth","Truth","Truth","T"),
+ P("Earlobe Alley","Earlobe Al","pink","ears",["Kiss their ear for {t} seconds","Nibble their ear and whisper something filthy"]),P("Lips Lane","Lips Ln","pink","lips",["Kiss their lips for {t} seconds","Make out with them for {t} seconds"]),
+ X("afro","Afro Break","Afro Break","♫"),P("Neck Street","Neck St","pink","neck",["Kiss their neck for {t} seconds","Kiss and suck on their neck for {t} seconds"]),X("dice","Sexy Dice","Sexy Dice","⚄"),
+ X("jar","Kiss Jar","Kiss Jar","♥"),
+ P("Collarbone Close","Collarbone","orange","collarbone",["Kiss their collarbone for {t} seconds","Take a body shot off their collarbone"]),X("blind","Blindfold Bay","Blindfold","◐"),
+ P("Chest Avenue","Chest Ave","orange","chest",["Kiss their chest for {t} seconds","Take their top off and kiss their chest for {t} seconds"]),P("Nipple Row","Nipple Row","orange","nipples",["Kiss their nipples for {t} seconds","Lick and suck their nipples for {t} seconds"]),
+ X("hot","Hot Seat","Hot Seat","♨"),P("Belly Button Bay","Belly Bay","green","belly button",["Kiss around their belly button for {t} seconds","Take a body shot from their belly button"]),X("dare","Dare","Dare","D"),
+ X("gojail","Go to Jail","Go to jail","⚑"),
+ P("Hip Bone Hill","Hip Hill","green","hips",["Kiss their hip bones for {t} seconds","Nibble along their hip bones for {t} seconds"]),P("Lower Back Road","Lower Back","green","lower back",["Massage their lower back for {t} seconds","Kiss their lower back, top off, for {t} seconds"]),
+ P("Inner Thigh Mayfair","Inner Thigh","dblue","inner thighs",["Kiss their inner thighs for {t} seconds","Kiss slowly up their inner thighs for {t} seconds"]),P("Booty Boulevard","Booty Blvd","dblue","bum",["Give them 5 spanks, then kiss it better","Kiss and bite their bum cheeks for {t} seconds"]),
+ X("duel","Duel","Duel","⚔"),P("Ousna Street","Ousna St","royal","body below the waist",["Kiss and tease them below the waist, over the underwear, for {t} seconds","Underwear off. Kiss and tease them down there for {t} seconds"]),P("Tom Johnson Estate","Tom Johnson","royal","body below the waist",["Tease them through their underwear for {t} seconds","Underwear off. Hands and lips down there for {t} seconds"])];
+const KIND={chance:["Chance","#eab14b"],strip:["Strip Tax","#c7305e"],truth:["Truth","#7a5ad8"],dare:["Dare","#7a5ad8"],hot:["Hot Seat","#e0503f"],jar:["Kiss Jar","#e58fb0"],duel:["Duel","#2c55b8"],dice:["Sexy Dice","#c7305e"],go:["GO","#3fae7a"],jail:["Jail","#9aa6cf"],gojail:["Busted","#9aa6cf"],spank:["Spank Station","#c7305e"],blind:["Blindfold Bay","#7a5ad8"],afro:["Afro Break","#e8954a"],p:["","#2c55b8"]};
+const SDESC={go:"Pass or land on GO: collect £200 (£100 in a quick game) and your partner kisses you anywhere you choose. Land right on it: they also do one thing you want.",jail:"Just visiting, unless you were sent here. Jailed? Take a shot or pay £50 bail to get out, or stay locked up and lose your turn.",jar:"Every time someone drinks instead of doing something, a kiss and £50 go in the jar. Taxes and bail go in too. Land here and collect the lot.",gojail:"Straight to jail. Do not pass GO.",chance:"Draw a Chance card. Strips, steals, spanks, swaps, free upgrades.",strip:"Pay £100 into the Kiss Jar, or lose an item.",truth:"Filthy truth card (Your Deck included). Answer or drink 2.",dare:"Filthy dare card (Your Deck included). Do it or drink 2.",hot:"Your partner gets 60 seconds to do whatever they want to you. You can't touch back. Survive or drink 2.",duel:"A quick challenge. Winner steals one of the loser's spots. Loser has no spots? They strip.",dice:"Roll the sexy dice and do it to your partner, or drink 2.",spank:"Roll a die. Your partner gives you double that many spanks. Count them out loud.",blind:"Blindfold on for your next two turns. Your partner can kiss you anywhere while it's on.",afro:"Put on an Afrobeats song and dance together, close. First to stop drinks."};
+const CHANCE=[
+ {x:"Take one item off your partner. Teeth only if you can.",fx:"stripthem"},{x:"Advance to GO. Your partner kisses you anywhere you choose.",fx:"go"},
+ {x:"Hostile takeover. Steal one of your partner's spots.",fx:"steal"},{x:"Go back 3 squares.",fx:"back3"},
+ {x:"Give your partner a 30-second lap dance."},{x:"Swap places on the board with your partner.",fx:"swap"},
+ {x:"Get out of rent free. Save it for when you need it.",fx:"free"},{x:"Go straight to jail. Do not pass GO.",fx:"jail"},
+ {x:"Lose one item. Your choice which.",fx:"stripme"},{x:"Body shot from wherever your partner picks."},
+ {x:"Your partner is in charge until your next turn. Whatever they say goes."},{x:"Renovation. Upgrade one of your spots for free.",fx:"upgrade"},
+ {x:"Add 3 kisses to the Kiss Jar.",fx:"jar3"},{x:"Blindfold on for your next two turns.",fx:"blind"},
+ {x:"Swap one item of clothing with your partner."},{x:"Whisper the dirtiest thing you can think of. If they don't react, drink."},
+ {x:"Your partner gets 30 seconds to kiss you anywhere, and you can't move."},{x:"Ice cube anywhere on your partner for 20 seconds."},
+ {x:"Suck your partner's toes for 15 seconds."},{x:"Spank Station express: 5 spanks from your partner."},{x:"Afro Break: put a song on and dance together. First to stop drinks."},
+ {x:"Bank error in your favour. Collect £200.",fx:"cash",n:200},{x:"You won a beauty contest. Collect £100.",fx:"cash",n:100},
+ {x:"Pay your partner £100. They owe you a lap dance for it.",fx:"payp",n:100},{x:"Your partner pays you £100, and you give them a 30-second massage for it.",fx:"getp",n:100},
+ {x:"Doctor's fee for all those love bites. Pay £50 into the Kiss Jar.",fx:"tojar",n:50}];
+const DUELS=["Staring contest","Thumb war","Rock paper scissors, best of 3","Arm wrestle","First to make the other laugh","Longest kiss without breaking. First to pull away loses","Look Away: rock paper scissors, then point. First to 2 catches","Slap hands, first to 3","Hold a plank. First to drop loses"];
+function pos(i){if(i<=8)return[9,9-i];if(i<=16)return[9-(i-8),1];if(i<=24)return[1,1+(i-16)];return[1+(i-24),9]}
+
+/* =================== STATE =================== */
+const DEF={mode:"h2h",phase:"setup",names:["Player 1","Player 2"],toWin:5,gamesToWin:3,pickMode:"random",heat:2,on:ORDER.slice(),gameCost:"Shot",matchCost:"Magic potion",
+  pts:[0,0],games:[0,0],drinks:[0,0],spank:[0,0],rpsNight:[0,0],turn:0,picker:0,last:null,r:null,undo:[],used:{},myTruth:"",myDare:"",
+  bTarget:6,bClothes:5,bCash:1500,bLen:"quick",uiSize:0,b:null,autoHeat:0,sound:1,playlist:"",myChance:"",cb:[false,false],sudden:false,night:{shots:[0,0],drinks:[0,0],forfeits:[0,0],strip:[0,0],wins:[0,0],games:{}},shotEvery:5,rounds:0};
+let S=JSON.parse(JSON.stringify(DEF));
+try{const s=JSON.parse(localStorage.getItem("noite4")||"null");if(s)S=Object.assign(S,s)}catch(e){}
+if(S.b&&!S.b.cash){S.b=null;if(S.phase==="board"||S.phase==="bover")S.phase="setup"}
+if(S.b)S.b.moving=false;
+if(S.b){S.b.mort=S.b.mort||{};S.b.big=S.b.big||[false,false]}
+S.night=Object.assign({shots:[0,0],drinks:[0,0],forfeits:[0,0],strip:[0,0],wins:[0,0],games:{}},S.night||{});S.cb=S.cb||[false,false];if(!S.tab)S.tab=S.mode||"h2h";
+S.drunk=Object.assign({levels:[],unlocked:false,used:false,lastCheck:null,rem:0},S.drunk||{});if(S.drunk.lastCheck==null)S.drunk.lastCheck=drinkTotal();S.myCut=S.myCut||"";
+S.deck=S.deck||{truth:[],dare:[],chance:[],cut:[]};[["truth","myTruth"],["dare","myDare"],["chance","myChance"],["cut","myCut"]].forEach(([k,old])=>{S.deck[k]=S.deck[k]||[];if(S[old]){lines(S[old]).forEach(t=>S.deck[k].push({t,by:null}));S[old]=""}});Object.keys(S.deck).forEach(k=>S.deck[k]=S.deck[k].map(x=>({t:x.t})));if(!S.plMine){S.playlist="https://open.spotify.com/playlist/6Lj9ICDSyFd9yjWMycvFpQ?si=RZRAO2ieTI2tk8eVqvs1rQ&utm_source=copy-link&pi=R60V0fJfQmKV7";S.plMine=true}
+S.on=S.on.filter(k=>GAMES[k]);if(!S.trustAdded){S.trustAdded=true;if(!S.on.includes("trust"))S.on.unshift("trust")}if(!S.on.length)S.on=ORDER.slice();if(S.r&&!GAMES[S.r.g]){S.r=null;if(S.phase==="play")S.phase="pick"}
+const save=()=>{try{localStorage.setItem("noite4",JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const rnd=n=>Math.floor(Math.random()*n);
+const one=a=>a[rnd(a.length)];
+const N=i=>esc(S.names[i]);
+const lines=t=>(t||"").split("\n").map(x=>x.trim()).filter(Boolean);
+function pick(key,arr){key+=":"+arr.length;S.used[key]=S.used[key]||[];if(S.used[key].length>=arr.length)S.used[key]=[];let i;do{i=rnd(arr.length)}while(S.used[key].includes(i));S.used[key].push(i);return arr[i]}
+const dk=k=>((S.deck&&S.deck[k])||[]).map(x=>x.t);
+function pool(kind,h){return C[kind][h].concat(h>=1?dk(kind):[])}
+function toast(t){const e=$("toast");e.textContent=t;e.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("show"),1900)}
+function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
+let timer=null,qTimer=null,cdTimer=null;function stopTimers(){clearInterval(timer);timer=null;clearTimeout(qTimer);qTimer=null;clearInterval(cdTimer);cdTimer=null}
+let ov=null,alertQ=[];
+function nag(kind,who,note){who=[...new Set(who)];if(!who.length)return;alertQ.push({kind,who,note:note||""});sfx(kind);const nk={shot:"shots",drink:"drinks",forfeit:"forfeits"}[kind];if(nk)who.forEach(k=>S.night[nk][k]+=(kind==="drink"&&/Drink 2/.test(note||""))?2:1);if(kind==="forfeit"&&/item off/i.test(note||""))who.forEach(k=>S.night.strip[k]++);buzz(kind==="shot"?[200,100,200]:150)}
+const isShot=t=>/shot/i.test(t||"");
+function vAlert(){const a=alertQ[0],names=a.who.length===2?"Both of you":S.names[a.who[0]];
+  const T={shot:["SHOT<br>TIME","Shot done","Shot time"],drink:["DRINK<br>TIME","Drank it","Drink time"],forfeit:["FORFEIT","Done it","Forfeit"],unlock:["CUT<br>UNLOCKED","Later","Cut unlocked"],remind:["THE CUT<br>IS WAITING","Later","Cut reminder"]}[a.kind];
+  return `<div class="alert ${a.kind}" data-a="alertok" role="alertdialog" aria-label="${T[2]}"><p class="ah">${T[0]}</p><div class="aw">${esc(names)}</div>${a.note?`<div class="an ${a.kind==="forfeit"?"big2":""}">${esc(a.note)}</div>`:""}${a.kind==="unlock"||a.kind==="remind"?`<button class="btn gonow" data-a="cutgo">🎥 Go film it now</button>`:""}<button class="btn" data-a="alertok">${T[1]}</button></div>`}
+
+/* =================== HEAD TO HEAD =================== */
+function maths(){const t=rnd(5);let q,a;
+  if(t===0){const x=12+rnd(80),y=12+rnd(80);q=`${x} + ${y}`;a=x+y}
+  else if(t===1){const x=3+rnd(10),y=3+rnd(10);q=`${x} × ${y}`;a=x*y}
+  else if(t===2){const x=50+rnd(100),y=11+rnd(40);q=`${x} − ${y}`;a=x-y}
+  else if(t===3){const p=[10,20,25,50][rnd(4)],b=[40,60,80,120,200,240][rnd(6)];q=`${p}% of ${b}`;a=b*p/100}
+  else{const x=2+rnd(9),y=2+rnd(9),z=1+rnd(20);q=`${x} × ${y} + ${z}`;a=x*y+z}
+  return{q,a}}
+function makeShips(){const occ=new Array(25).fill(-1);
+  [3,2,1].forEach((len,id)=>{for(;;){const h=rnd(2),r=rnd(h?5:6-len),c=rnd(h?6-len:5);const cells=[...Array(len)].map((_,k)=>h?r*5+c+k:(r+k)*5+c);if(cells.every(x=>occ[x]<0)){cells.forEach(x=>occ[x]=id);break}}});return occ}
+const CARD=["A","2","3","4","5","6","7","8","9","10","J","Q","K"],SUIT=["♠","♥","♦","♣"];
+const newCard=()=>({v:rnd(13),s:rnd(4)});
+const combo=n=>[...Array(2+n)].map(()=>one(MOVES)).join(" · ");
+const simonCmd=()=>{const s=Math.random()<.65;return{s,x:(s?"Simon says ":"")+one(SIMON)}};
+function startRound(g){
+  stopTimers();const h=S.heat,p=S.turn;let r={g,p,stage:0};
+  switch(g){
+   case "truth":case "dare":r.w=pick(g+h,h===2&&g==="truth"?pool(g,h).concat(TRUST):pool(g,h));break;
+   case "trust":r.w=pick("trust",TRUST.concat(dk("truth")));break;
+   case "never":case "likely":case "know":r.w=pick(g+h,C[g][h]);break;
+   case "dice":r.d=[one(C.diceA[h]),one(C.diceB[h]),one(C.diceT)];break;
+   case "blind":r.w=`Touch them with your ${one(C.blindTool[h])} on their ${one(C.blindSpot[h])}.`;break;
+   case "gkiss":r.w=`Kiss them with your ${one(C.kissTool[h])} on their ${one(KSPOT)}.`;break;
+   case "flinch":r.w=pick("fl"+h,C.flinch[h]);r.t=60;r.stage=1;break;
+   case "freeze":r.w=pick("fl"+h,C.flinch[h]);r.t=60;r.stage=1;r.fz=0;r.nx=5+rnd(6);break;
+   case "hotcold":r.w=one(HOTCOLD);r.t=60;break;
+   case "toetap":r.w=one(TOES);break;
+   case "draw":r.w=pick("dr",DRAW);break;
+   case "simon":r.k=0;r.cmd=simonCmd();break;
+   case "kroul":r.d=[one(KROUL),one(["10 sec","20 sec","30 sec","45 sec"])];break;
+   case "sroul":r.w=one(SHOTSPOT);break;
+   case "ice":r.w=one(ICEPATH);break;
+   case "strivia":{const x=pick("gk",GK);r.q=x[0];r.a=x[1];break}
+   case "two":r.w=one(C.two[h]);break;
+   case "stare":r.w=C.stare[h];break;
+   case "hook":case "tune":case "whosang":{const x=pick("af"+g,AFRO);r.song=x[0];r.artist=x[1];break}
+   case "afrocats":r.w=pick("afc",AFROCATS);r.active=p;r.t=5;break;
+   case "cats":r.w=pick("ct"+h,C.cats[h]);r.active=p;r.t=5;break;
+   case "rps":r.tal=[0,0];r.need=2;r.stake=one(STAKES);r.dbl=false;break;
+   case "look":r.tal=[0,0];r.need=3;break;
+   case "slap":r.tal=[0,0];r.need=3;break;
+   case "thumb":r.tal=[0,0];r.need=2;break;
+   case "combo":case "hilo":r.sc=[null,null];r.cur=p;r.n=0;r.cmb=combo(0);r.card=newCard();break;
+   case "bomb":r.w=pick("bm",BOMBCATS);r.holder=p;break;
+   case "quick":r.qs="ready";break;
+   case "charades":r.w=pick("ch"+h,C.charades[h]);r.t=60;break;
+   case "sentence":r.w=pick("se"+h,C.sentence[h]);r.t=90;break;
+   case "maths":Object.assign(r,maths());break;
+   case "gk":{const x=pick("gk",GK);r.q=x[0];r.a=x[1];break}
+   case "spell":r.w=pick("sp",SPELL);break;
+   case "hang":r.w=pick("hg"+h,C.hang[h]);r.guessed=[];r.wrong=0;break;
+   case "ship":r.occ=makeShips();r.shot=new Array(25).fill(0);r.sunk=[-1,-1,-1];r.shooter=p;break;
+  }
+  S.night.games[g]=(S.night.games[g]||0)+1;
+  S.r=r;S.phase="play";save();render(true);
+}
+const randomGame=()=>{let l=S.on.filter(g=>g!==S.last);if(!l.length)l=S.on;return one(l)};
+function nextRound(){if(S.pickMode==="choose"){stopTimers();S.phase="pick";S.r=null;save();render(true)}else startRound(randomGame())}
+function award(w,drinkFor){
+  stopTimers();
+  S.undo.push(JSON.stringify({pts:S.pts,games:S.games,drinks:S.drinks,spank:S.spank,turn:S.turn,r:S.r,rounds:S.rounds||0,rpsNight:S.rpsNight}));if(S.undo.length>20)S.undo.shift();
+  const dl=(Array.isArray(drinkFor)?drinkFor:drinkFor!=null?[drinkFor]:[]);dl.forEach(i=>S.drinks[i]++);
+  if(dl.length)nag("drink",dl,"Lost the round");
+  if(S.sudden){S.sudden=false;S.games[w]=Math.max(S.games[w]+1,S.gamesToWin);S.pts=[0,0];S.phase="match";S.winner=w;S.night.wins[w]++;sfx("go");save();return render(true)}
+  sfx("point");
+  S.pts[w]++;S.spank[1-w]++;S.rounds=(S.rounds||0)+1;S.last=S.r?S.r.g:null;S.picker=1-w;S.turn=1-S.turn;toast(`Point to ${S.names[w]}`);
+  const gameOver=S.pts[w]>=S.toWin;
+  if(S.shotEvery&&S.rounds%S.shotEvery===0&&!gameOver){S.drinks[0]++;S.drinks[1]++}if(S.shotEvery&&S.rounds%S.shotEvery===0&&!gameOver)nag("shot",[0,1],`Shot clock: round ${S.rounds}. Everybody drinks.`);
+  if(gameOver){const l=1-w;S.games[w]++;S.cb=[false,false];S.drinks[l]++;nag(isShot(S.gameCost)?"shot":"drink",[l],`Lost the game: ${S.gameCost}`);S.lastGame=[S.pts[w],S.pts[l]];S.pts=[0,0];
+    if(S.games[w]>=S.gamesToWin){S.phase="match";S.winner=w;S.night.wins[w]++;save();return render(true)}
+    if(S.autoHeat&&S.heat<2){S.heat++;toast(`Heat rises: ${HEATS[S.heat]}`)}
+    S.phase="gameover";S.gw=w;save();return render(true)}
+  tickRemind();save();nextRound();
+}
+function undo(){const u=S.undo.pop();if(!u)return toast("Nothing to undo");alertQ=[];Object.assign(S,JSON.parse(u));S.phase=S.r?"play":"pick";save();toast("Last point undone");render(true)}
+function countdown(seq,done){stopTimers();let i=0;const el=()=>$("cd");if(el())el().textContent=seq[0];
+  cdTimer=setInterval(()=>{i++;if(i<seq.length){if(el())el().textContent=seq[i];if(i===seq.length-1)buzz(120)}else{clearInterval(cdTimer);cdTimer=null;done&&done()}},600)}
+
+/* =================== BOARD =================== */
+const PRICE={brown:60,lblue:100,pink:140,orange:180,green:240,dblue:350,royal:400};
+const RENTM={brown:[10,40,120],lblue:[15,60,180],pink:[20,80,240],orange:[30,120,360],green:[40,160,480],dblue:[60,250,750],royal:[80,320,950]};
+const money=n=>"£"+Number(n).toLocaleString("en-GB");
+function newBoard(){const quick=S.bLen!=="classic",c=quick?1000:(S.bCash||1500);return{quick,endAt:quick?Date.now()+45*60000:null,pos:[0,0],own:{},lvl:{},turn:rnd(2),jail:[false,false],free:[0,0],rev:[0,0],blind:[0,0],drinks:[0,0],clothes:[S.bClothes,S.bClothes],cash:[c,c],jar:0,jarCash:0,stage:"roll",dice:[1,1],doubles:0,again:false,card:null,log:[],moving:false,passed:false,turns:0,ctx:null,debt:null,auc:null,saved:null,mort:{},big:[false,false]}}
+const B=()=>S.b;
+function ownedBy(i){return Object.keys(S.b.own).filter(k=>S.b.own[k]===i).map(Number)}
+function hasSet(idx,owner){const g=SQ[idx].g;return SQ.every((q,k)=>q.g!==g||S.b.own[k]===owner)}
+function rentAt(idx,lv,set,ownerName){const q=SQ[idx];let t=lv===1?BASE[q.g]:lv===2?BASE[q.g]*2:60;if(set)t*=2;
+  if(lv<3)return q.v[lv-1].replace("{t}",t);
+  const base=q.part?`${ownerName} decides exactly what you do to their ${q.part} for ${t} seconds`:`${ownerName} has full control of you for ${t} seconds`;return lv===4?base+", then you take a shot":base}
+const rentMoney=(i,lv,set)=>{const base=(lv===4?Math.round(RENTM[SQ[i].g][2]*1.5/10)*10:RENTM[SQ[i].g][lv-1])*(set?2:1);return S.b&&S.b.quick?Math.round(base*1.5/5)*5:base};
+const goPay=()=>S.b&&S.b.quick?100:200;
+const upCostTo=(i,next)=>next===4?PRICE[SQ[i].g]:PRICE[SQ[i].g]/2;
+const upCost=i=>PRICE[SQ[i].g]/2;
+const spotValue=i=>{const lv=S.b.lvl[i]||1,pr=PRICE[SQ[i].g];return pr+(Math.min(lv,3)-1)*pr/2+(lv===4?pr:0)-(S.b.mort&&S.b.mort[i]?pr/2:0)};
+const worth=p=>S.b.cash[p]+ownedBy(p).reduce((t,i)=>t+spotValue(i),0);
+function logIt(t){const b=B();b.log.unshift(t);b.log=b.log.slice(0,5)}
+function card(kind,title,text,btns,sub){const b=B();b.card={kind,title,text,btns,sub:sub||null,bonus:b.bonus||null};b.bonus=null}
+function stripOne(i){const b=B();if(b.clothes[i]>0){b.clothes[i]--;S.night.strip[i]++;return true}return false}
+function give(from,to,amt){const b=B();b.cash[from]-=amt;if(to==="jar")b.jarCash+=amt;else if(to!=="bank")b.cash[to]+=amt}
+function charge(p,amt,to,reason,after){const b=B();if(b.cash[p]>=amt){give(p,to,amt);return true}b.debt={p,amt,to,reason,after:after||null};debtCard();return false}
+function debtCard(){const b=B(),d=b.debt,btn=[];if(b.cash[d.p]>=d.amt)btn.push(["payup",`Pay ${money(d.amt)}`,"go"]);btn.push(["debtdare","Do a dare for £100","red"]);if(ownedBy(d.p).some(k=>!b.mort[k]))btn.push(["mortmenu","Mortgage a spot","ghost"]);if(ownedBy(d.p).length)btn.push(["sellmenu","Sell a spot","ghost"]);btn.push(["bankrupt","Declare bankrupt","ghost"]);
+  card("debt","Short on cash",`${S.names[d.p]} owes ${money(d.amt)} for ${d.reason} but only has ${money(b.cash[d.p])}. Raise it with dares or by selling spots, or go bankrupt.`,btn,`${S.names[d.p]} · the bank`)}
+function aucCard(){const b=B(),a=b.auc,q=SQ[a.i],btn=[];
+  [0,1].forEach(k=>[10,50].forEach(v=>{if(b.cash[k]>=a.bid+v)btn.push([`a${k}_${v}`,`${S.names[k]} +£${v}`,k?"red":"go"])}));
+  btn.push(a.lead!=null?["sold",`Sold to ${S.names[a.lead]}`,"ghost"]:["nobuy","Nobody wants it","ghost"]);
+  card("auction","Auction: "+q.l,`List price ${money(PRICE[q.g])}. ${a.lead==null?"No bids yet. Bids start at £10.":`Top bid: ${money(a.bid)} from ${S.names[a.lead]}.`} Keep raising, then tap Sold.`,btn,"Both of you can bid")}
+function bribeCard(){const b=B(),p=b.turn,c=b.ctx||{},need=c.type==="rent"?c.m:0;
+  const btn=[50,100,200].filter(v=>b.cash[p]>=v+need).map(v=>["b"+v,`Offer ${money(v)}`,"go"]);btn.push(["back","Back","ghost"]);
+  card("bribe","Offer a bribe",btn.length>1?`Pay ${S.names[1-p]} to let you skip the forfeit${c.type==="rent"?". The rent money still gets paid":""}. How much?`:"You can't afford a bribe right now.",btn)}
+function land(p,prefix){
+  const b=B(),o=1-p,i=b.pos[p],q=SQ[i],nm=S.names[p],on=S.names[o];b.ctx=null;
+  let pre=prefix||"";if(b.passed){const gp=goPay();b.cash[p]+=gp;sfx("go");b.bonus=`Passed GO: +${money(gp)}, and ${on} kisses you anywhere you choose.`;toast(`+${money(gp)} for passing GO`);logIt(`${nm} collected ${money(gp)} at GO`);b.passed=false}
+  const done=[["next","Done","go"]];
+  const forfeit=l=>{b.ctx={type:"forfeit"};return[["next",l,"go"],["drink","Drink 2","red"],["bribe","Offer a bribe","ghost"]]};
+  if(q.t==="p"){const own=b.own[i],pr=PRICE[q.g];
+    if(own==null){const can=b.cash[p]>=pr;return card("p",q.l,pre+`For sale: ${money(pr)}. Rent starts at ${money(RENTM[q.g][0])} plus: ${rentAt(i,1,false,nm).toLowerCase()}.${can?"":" You can't afford it, so it goes to auction."}`,can?[["buy",`Buy for ${money(pr)}`,"go"],["auction","Pass, auction it","ghost"]]:[["auction","Auction it","go"]])}
+    if(own===p){const lv=b.lvl[i]||1,nx=lv+1,cst=upCostTo(i,nx);
+      if(b.mort[i]){const pay=Math.round(PRICE[q.g]*.55);return card("p",q.l,pre+`Your spot is mortgaged, so it earns nothing. Pay it off for ${money(pay)}?`,b.cash[p]>=pay?[["unmort",`Pay off ${money(pay)}`,"go"],["next","Leave it","ghost"]]:[["next","Can't afford it","ghost"]])}
+      return lv<4?card("p",q.l,pre+(nx===4?`Your spot is maxed. Build a Penthouse for ${money(cst)}: rent becomes ${money(rentMoney(i,4,false))} plus ${rentAt(i,4,false,nm).toLowerCase()}.`:`Your spot. Upgrade to level ${nx} for ${money(cst)}: rent goes to ${money(rentMoney(i,nx,false))} plus ${rentAt(i,nx,false,nm).toLowerCase()}.`),b.cash[p]>=cst?[["upgrade",nx===4?`Build Penthouse · ${money(cst)}`:`Upgrade for ${money(cst)}`,"go"],["next","Leave it","ghost"]]:[["next","Can't afford it","ghost"]])
+                 :card("p",q.l,pre+"Your Penthouse. Sit back and wait for them.",done)}
+    if(b.mort[i])return card("p",q.l,pre+`${on} has mortgaged this spot, so there's no rent. Lucky escape.`,done);
+    const lv=b.lvl[i]||1,set=hasSet(i,own),m=rentMoney(i,lv,set);b.ctx={type:"rent",i,owner:own,m};
+    const btn=[["rentdo",`Pay ${money(m)} and do it`,"go"]];if(b.clothes[p]>0)btn.push(["rentstrip","Pay and strip instead","red"]);btn.push(["rentdrink","Pay and drink 2 instead","red"]);
+    if(b.free[p])btn.push(["usefree","Use Rent Free","ghost"]);if(b.rev[p])btn.push(["userev","Use Reverse Rent","ghost"]);btn.push(["bribe","Offer a bribe","ghost"]);
+    return card("p",q.l,pre+`${on} owns this${set?" and the whole set (double rent)":""}. Level ${lv} rent: ${money(m)} plus ${rentAt(i,lv,set,on).toLowerCase()}.`,btn)}
+  if(q.t==="go")return card("go","GO",pre+`Landed right on GO. ${on} also does one thing you want, right now.`,done);
+  if(q.t==="jail")return card("jail","Just visiting",pre+`Wave at the bars. Nothing happens. Yet.`,done);
+  if(q.t==="gojail"){b.pos[p]=8;b.jail[p]=true;b.again=false;logIt(`${nm} went to jail`);return card("gojail","Go to jail",pre+"Busted. Straight to jail. Next turn, take a shot or pay £50 bail to get out.",done)}
+  if(q.t==="strip"){const btn=[];if(b.cash[p]>=100)btn.push(["taxpay","Pay £100","go"]);if(b.clothes[p]>0)btn.push(["taxstrip","Lose an item","red"]);if(!btn.length)btn.push(["drink","Drink 2 instead","red"]);
+    return card("strip","Strip Tax",pre+`Pay £100 into the Kiss Jar, or take one item off. You've got ${b.clothes[p]} item${b.clothes[p]===1?"":"s"} left.`,btn)}
+  if(q.t==="truth")return card("truth","Truth",pre+pick("bt",pool("truth",2).concat(TRUST)),forfeit("Answered"));
+  if(q.t==="dare")return card("dare","Dare",pre+pick("bd",pool("dare",2)),forfeit("Done it"));
+  if(q.t==="hot")return card("hot","Hot Seat",pre+`${on} gets 60 seconds to do whatever they want to you. You can't touch back.`,forfeit("Survived"));
+  if(q.t==="dice")return card("dice","Sexy Dice",pre+`${one(C.diceA[2])} ${on}'s ${one(C.diceB[2]).toLowerCase()} for ${one(C.diceT).toLowerCase()}.`,forfeit("Done it"));
+  if(q.t==="spank"){const n=(1+rnd(6))*2;return card("spank","Spank Station",pre+`Rolled for spanks: ${n}. ${on} gives them to you, and you count every one out loud.`,forfeit("Took them"))}
+  if(q.t==="blind"){b.blind[p]=2;logIt(`${nm} is blindfolded`);return card("blind","Blindfold Bay",pre+`Blindfold on for your next two turns. ${on} can kiss you anywhere while it's on.`,done)}
+  if(q.t==="afro")return card("afro","Afro Break",pre+"Put an Afrobeats song on and dance together, close. First to stop drinks.",[["afro0",`${S.names[0]} stopped`,"red"],["afro1",`${S.names[1]} stopped`,"red"]]);
+  if(q.t==="jar"){const k=Math.max(1,b.jar),cash=b.jarCash;b.jar=0;b.jarCash=0;b.cash[p]+=cash;logIt(`${nm} emptied the Kiss Jar${cash?` (+${money(cash)})`:""}`);
+    return card("jar","Kiss Jar",pre+`Jackpot. ${cash?`You collect ${money(cash)}, and `:""}${on} owes you ${k} kiss${k>1?"es":""}, anywhere you choose, right now.`,done)}
+  if(q.t==="duel"){const d=one(DUELS);return card("duel","Duel",pre+`${d}. Winner steals a spot from the loser. Loser has no spots? They strip.`,[["duel0",`${S.names[0]} won`,"go"],["duel1",`${S.names[1]} won`,"go"]])}
+  if(q.t==="chance"){const c=pick("bc",CHANCE.concat(dk("chance").map(x=>({x}))));let x=c.x;
+    if(c.fx==="go"){b.pos[p]=0;b.cash[p]+=goPay();x+=` Collect ${money(goPay())}.`}
+    if(c.fx==="back3"){b.pos[p]=(i+29)%32;return land(p,pre+"Chance: go back 3. ")}
+    if(c.fx==="swap"){const t=b.pos[0];b.pos[0]=b.pos[1];b.pos[1]=t}
+    if(c.fx==="free")b.free[p]++;
+    if(c.fx==="blind")b.blind[p]=2;
+    if(c.fx==="jail"){b.pos[p]=8;b.jail[p]=true;b.again=false}
+    if(c.fx==="stripme"&&!stripOne(p))x="You'd lose an item, but you've got nothing left. Drink 2.";
+    if(c.fx==="stripthem"&&!stripOne(o))x=`${on} has nothing left to take off. Kiss them anywhere instead.`;
+    if(c.fx==="jar3")b.jar+=3;
+    if(c.fx==="cash")b.cash[p]+=c.n;
+    if(c.fx==="steal"){const t=ownedBy(o);if(t.length){const k=one(t);b.own[k]=p;x+=` You took ${SQ[k].l}.`;logIt(`${nm} stole ${SQ[k].l}`)}else x+=` ${on} owns nothing yet.`}
+    if(c.fx==="upgrade"){const m=ownedBy(p).filter(k=>(b.lvl[k]||1)<3);if(m.length){const k=one(m);b.lvl[k]=(b.lvl[k]||1)+1;x+=` ${SQ[k].l} is now level ${b.lvl[k]}.`}else x+=" You've got nothing to upgrade."}
+    const cc={kind:"chance",title:"Chance",text:pre+x,btns:done,sub:null,bonus:b.bonus||null};b.bonus=null;
+    if(c.fx==="payp"&&!charge(p,c.n,o,"a Chance card",cc))return;
+    if(c.fx==="getp"&&!charge(o,c.n,p,"a Chance card",cc))return;
+    if(c.fx==="tojar"&&!charge(p,c.n,"jar","a Chance card",cc))return;
+    b.card=cc;return}
+}
+function endTurn(){const b=B();b.card=null;b.ctx=null;b.saved=null;
+  if(b.again&&!b.jail[b.turn]){b.again=false;b.stage="roll";toast("Doubles. Roll again.");return}
+  if(b.blind[b.turn]>0)b.blind[b.turn]--;
+  b.again=false;b.doubles=0;b.turn=1-b.turn;b.stage=b.jail[b.turn]?"jail":"roll";
+  b.turns=(b.turns||0)+1;if(b.turns%2===0)tickRemind();if(S.shotEvery&&b.turns%(S.shotEvery*2)===0){b.drinks[0]++;b.drinks[1]++}if(S.shotEvery&&b.turns%(S.shotEvery*2)===0)nag("shot",[0,1],`Shot clock: round ${b.turns/2}. Everybody drinks.`);
+  if(b.endAt&&Date.now()>=b.endAt){S.timeUp=true;endBoard();toast("Time's up! Richest wins")}}
+function roll(){
+  const b=B(),p=b.turn;if(b.moving)return;sfx("dice");
+  b.dice=[1+rnd(6),1+rnd(6)];const dbl=b.dice[0]===b.dice[1];b.doubles=dbl?b.doubles+1:0;b.again=dbl;b.spin=true;
+  if(b.doubles>=3){b.pos[p]=8;b.jail[p]=true;b.again=false;b.doubles=0;logIt(`${S.names[p]} rolled three doubles`);card("gojail","Three doubles","Speeding. Straight to jail.",[["next","Fine","go"]]);save();return render()}
+  let steps=b.dice[0]+b.dice[1];b.moving=true;save();render();
+  const tick=()=>{b.pos[p]=(b.pos[p]+1)%32;if(b.pos[p]===0)b.passed=true;steps--;
+    if(steps>0){render();setTimeout(tick,160)}else{b.moving=false;land(p);save();render()}};
+  setTimeout(tick,420);
+}
+function resolve(a){
+  const b=B(),p=b.turn,o=1-p,i=b.pos[p],nm=S.names[p],c=b.ctx||{};
+  const end=()=>endTurn();
+  const refuse=k=>{b.drinks[k]+=2;b.jar++;nag("drink",[k],"Drink 2");let t="+1 kiss in the jar";if(b.cash[k]>=50){give(k,"jar",50);t="+1 kiss and £50 in the jar"}logIt(`${S.names[k]} drank 2. ${t}`)};
+  let m;
+  if((m=a.match(/^a(\d)_(\d+)$/))){const k=+m[1];b.auc.bid+=+m[2];b.auc.lead=k;return aucCard()}
+  if((m=a.match(/^mort(\d+)$/))){const k=+m[1],who=b.debt?b.debt.p:b.turn,val=PRICE[SQ[k].g]/2;b.mort[k]=true;b.cash[who]+=val;sfx("cash");logIt(`${S.names[who]} mortgaged ${SQ[k].l} for ${money(val)}`);if(b.debt)return debtCard();b.card=null;return}
+  if((m=a.match(/^sell(\d+)$/))){const k=+m[1],d=b.debt,val=Math.floor(spotValue(k)/2);b.cash[d.p]+=val;delete b.own[k];delete b.lvl[k];logIt(`${S.names[d.p]} sold ${SQ[k].l} for ${money(val)}`);return debtCard()}
+  if((m=a.match(/^b(\d+)$/))){const amt=+m[1];b.bribe=amt;return card("bribe","Bribe",`${nm} offers ${S.names[o]} ${money(amt)} to skip the forfeit${c.type==="rent"?" (rent money still gets paid)":""}. ${S.names[o]}, deal?`,[["bribeyes","Take the money","go"],["bribeno","No deal","red"]])}
+  switch(a){
+    case "next":return end();
+    case "close":b.card=null;return;
+    case "buy":{const pr=PRICE[SQ[i].g];give(p,"bank",pr);b.own[i]=p;b.lvl[i]=1;logIt(`${nm} bought ${SQ[i].l} for ${money(pr)}`);if(hasSet(i,p))toast("Full set! Rent doubled");return end()}
+    case "auction":b.auc={i,bid:0,lead:null};return aucCard();
+    case "sold":{const au=b.auc;give(au.lead,"bank",au.bid);b.own[au.i]=au.lead;b.lvl[au.i]=1;logIt(`${S.names[au.lead]} won ${SQ[au.i].l} at auction for ${money(au.bid)}`);b.auc=null;return end()}
+    case "nobuy":b.auc=null;return end();
+    case "upgrade":{const nx=(b.lvl[i]||1)+1,cst=upCostTo(i,nx);give(p,"bank",cst);b.lvl[i]=nx;sfx("cash");logIt(nx===4?`${nm} built a Penthouse on ${SQ[i].l}`:`${nm} upgraded ${SQ[i].l} to L${nx}`);return end()}
+    case "unmort":{const pay=Math.round(PRICE[SQ[i].g]*.55);give(p,"bank",pay);delete b.mort[i];logIt(`${nm} paid off the mortgage on ${SQ[i].l}`);return end()}
+    case "rentdo":case "rentstrip":case "rentdrink":
+      if((b.lvl[c.i]||1)===4){b.drinks[p]++;nag("shot",[p],`Penthouse rent on ${SQ[c.i].l}`)}
+      if(a==="rentstrip"){stripOne(p);logIt(`${nm} stripped instead (${b.clothes[p]} left)`)}
+      if(a==="rentdrink")refuse(p);
+      if(charge(p,c.m,c.owner,`rent on ${SQ[c.i].l}`)){sfx("cash");logIt(`${nm} paid ${money(c.m)} rent to ${S.names[c.owner]}`);return end()}return;
+    case "usefree":b.free[p]--;logIt(`${nm} used Rent Free`);return end();
+    case "userev":b.rev[p]--;toast("Reverse Rent!");logIt(`${nm} reversed the rent on ${SQ[c.i].l}`);
+      b.card=null;if(charge(c.owner,c.m,p,"Reverse Rent",{kind:"p",title:"Reverse Rent",text:`${S.names[c.owner]} pays you ${money(c.m)}, and does the rent to you instead: ${rentAt(c.i,b.lvl[c.i]||1,hasSet(c.i,c.owner),nm).toLowerCase()}.`,btns:[["next","Done","go"]],sub:null}))
+        card("p","Reverse Rent",`${S.names[c.owner]} pays you ${money(c.m)}, and does the rent to you instead: ${rentAt(c.i,b.lvl[c.i]||1,hasSet(c.i,c.owner),nm).toLowerCase()}.`,[["next","Done","go"]]);return;
+    case "bribe":b.saved=b.card;return bribeCard();
+    case "bribeyes":give(p,o,b.bribe);logIt(`${S.names[o]} took a ${money(b.bribe)} bribe`);
+      if(c.type==="rent"){if(charge(p,c.m,c.owner,"rent"))return end();return}return end();
+    case "bribeno":case "back":b.card=b.saved;b.saved=null;if(!b.card&&b.debt)debtCard();return;
+    case "drink":refuse(p);return end();
+    case "taxpay":give(p,"jar",100);logIt(`${nm} paid £100 Strip Tax`);return end();
+    case "taxstrip":stripOne(p);logIt(`${nm} stripped for Strip Tax (${b.clothes[p]} left)`);return end();
+    case "afro0":case "afro1":{const k=+a[4];b.drinks[k]++;b.jar++;nag("drink",[k],"Stopped dancing first");logIt(`${S.names[k]} stopped dancing first`);return end()}
+    case "duel0":case "duel1":{const w=+a[4],l=1-w,t=ownedBy(l);
+      if(t.length){const k=one(t);b.own[k]=w;logIt(`${S.names[w]} won the duel and took ${SQ[k].l}`);toast(`${S.names[w]} takes ${SQ[k].l}`)}
+      else{stripOne(l);logIt(`${S.names[w]} won the duel. ${S.names[l]} stripped`);toast(`${S.names[l]} strips`)}return end()}
+    case "payup":{const d=b.debt;give(d.p,d.to,d.amt);b.debt=null;logIt(`${S.names[d.p]} paid ${money(d.amt)}`);if(d.after){b.card=d.after;return}return end()}
+    case "debtdare":b.saved=b.card;return card("earn","Earn £100",pick("bd",pool("dare",2)),[["earndone","Done it, +£100","go"],["back","Back","ghost"]],`${S.names[b.debt.p]} · the bank`);
+    case "earndone":if(b.debt){b.cash[b.debt.p]+=100;logIt(`${S.names[b.debt.p]} earned £100 with a dare`);return debtCard()}
+      b.cash[b.earner]+=100;logIt(`${S.names[b.earner]} earned £100 with a dare`);b.card=null;return;
+    case "sellmenu":{const d=b.debt;return card("sell","Sell a spot","Sell back to the bank for half its value.",ownedBy(d.p).map(k=>["sell"+k,`${SQ[k].s}: ${money(Math.floor(spotValue(k)/2))}`,"ghost"]).concat([["debtback","Back","ghost"]]),`${S.names[d.p]} · the bank`)}
+    case "debtback":return debtCard();
+    case "mortmenu":{const who=b.debt?b.debt.p:b.turn;return card("sell","Mortgage a spot",`Get half its price now. It earns no rent until you pay it off (land on it and pay ${"55%"} of the price).`,ownedBy(who).filter(k=>!b.mort[k]).map(k=>["mort"+k,`${SQ[k].s}: +${money(PRICE[SQ[k].g]/2)}`,"ghost"]).concat([[b.debt?"debtback":"close","Back","ghost"]]),`${S.names[who]} · the bank`)}
+    case "bankrupt":{const d=b.debt;S.winner=1-d.p;S.night.wins[1-d.p]++;S.bankrupt=d.p;S.phase="bover";b.card=null;b.debt=null;logIt(`${S.names[d.p]} went bankrupt`);return}
+    case "shoprev":give(b.shopper,"bank",200);b.rev[b.shopper]++;logIt(`${S.names[b.shopper]} bought Reverse Rent`);b.card=null;return;
+    case "shopfree":give(b.shopper,"bank",100);b.free[b.shopper]++;logIt(`${S.names[b.shopper]} bought Rent Free`);b.card=null;return;
+    case "shopcmd":give(b.shopper,"bank",150);logIt(`${S.names[b.shopper]} bought a Command`);return card("cmd","Command",`${S.names[1-b.shopper]} does one thing ${S.names[b.shopper]} says. Right now. No refusing.`,[["close","Done","go"]],`${S.names[b.shopper]} · power shop`);
+  }
+}
+function bank(a){const b=B();
+  if(a==="mort"){if(!ownedBy(b.turn).some(k=>!b.mort[k]))return toast("Nothing to mortgage");return resolve("mortmenu")}
+  if(a==="trade"){tr={g:[],t:[],cg:0,ct:0,sw:0,stage:"build"};ov="trade";return}
+  if(a==="earn"){b.earner=b.turn;b.saved=null;return card("earn","Earn £100",pick("bd",pool("dare",2)),[["earndone","Done it, +£100","go"],["close","Skip","ghost"]],`${S.names[b.turn]} · the bank`)}
+  if(a==="shop"){const k=b.turn;b.shopper=k;const btn=[];if(b.cash[k]>=200)btn.push(["shoprev","Reverse Rent · £200","go"]);if(b.cash[k]>=150)btn.push(["shopcmd","Command · £150","go"]);if(b.cash[k]>=100)btn.push(["shopfree","Rent Free · £100","go"]);btn.push(["close","Close","ghost"]);
+    return card("shop","Power shop",`Reverse Rent: next time you land on their spot, they pay you and do the rent to you. Command: ${S.names[1-k]} does one thing you say, right now. Rent Free: skip one rent completely.`,btn,`${S.names[k]} has ${money(b.cash[k])}`)}
+  if(a==="bar0"||a==="bar1"){const k=+a[3];if(b.cash[k]<100)return toast(`${S.names[k]} can't afford it`);give(k,"bank",100);logIt(`${S.names[k]} paid £100 to make ${S.names[1-k]} take a shot`);b.drinks[1-k]++;nag("shot",[1-k],`Bought by ${S.names[k]} for £100`)}
+}
+function endBoard(){const w=[0,1].map(worth);S.bankrupt=null;S.winner=w[0]===w[1]?-1:w[0]>w[1]?0:1;if(S.winner>=0)S.night.wins[S.winner]++;S.phase="bover"}
+
+function swapPlayers(){const sw=a=>{if(Array.isArray(a)&&a.length===2){const t=a[0];a[0]=a[1];a[1]=t}};
+  sw(S.names);["pts","games","drinks","spank","rpsNight"].forEach(k=>sw(S[k]));
+  if(S.r){S.r.p=1-S.r.p;["tal","sc"].forEach(k=>sw(S.r[k]));["active","holder","cur","shooter","qw"].forEach(k=>{if(typeof S.r[k]==="number")S.r[k]=1-S.r[k]});if(S.r.sunk)S.r.sunk=S.r.sunk.map(x=>x<0?x:1-x)}
+  S.turn=1-S.turn;S.picker=1-S.picker;
+  const b=S.b;if(b){["pos","jail","free","rev","blind","drinks","clothes","cash"].forEach(k=>sw(b[k]));Object.keys(b.own).forEach(k=>b.own[k]=1-b.own[k]);b.turn=1-b.turn}
+  toast("Players swapped")}
+/* =================== TIPSY CHECK + THE CUT =================== */
+function drinkTotal(){const n=S.night||{shots:[0,0],drinks:[0,0]};return n.shots[0]+n.shots[1]+n.drinks[0]+n.drinks[1]}
+const DLAB=["","Stone cold","Warmed up","Relaxed","Merry","Giggly","Loud","Saying I love you every 5 minutes","Deep conversations","Dancing on furniture","Crying at an Asake song"];
+const appGuess=k=>{const n=S.night;return Math.max(1,Math.min(10,Math.round(1+n.shots[k]*1.2+n.drinks[k]*.6)))};
+const CHECK_EVERY=4;
+const inGame=()=>S.phase!=="setup"&&S.tab===S.mode&&!S.cutOn&&S.phase!=="match"&&S.phase!=="bover";
+function startCheck(){S.checkDue=true;S.ck={step:0,v:[[0,0],[0,0]]}}
+function finishCheck(){const v=S.ck.v,lv=[0,1].map(k=>Math.round((v[k][0]+v[k][1])/2));
+  S.drunk.levels.push({t:Date.now(),l:lv});S.drunk.lastCheck=drinkTotal();S.checkDue=false;S.ck=null;
+  if(!S.drunk.unlocked&&lv[0]>7&&lv[1]>7){S.drunk.unlocked=true;alertQ.push({kind:"unlock",who:[0,1],note:"You're both past 7. Pause the game and go film it while you're loose."});sfx("go");buzz([200,100,200,100,300])}}
+function tickRemind(){const d=S.drunk;if(!d.unlocked||d.used||S.cutOn)return;d.rem=(d.rem||0)+1;if(d.rem%3===0)alertQ.push({kind:"remind",who:[0,1],note:"The Cut is unlocked and you haven't filmed it yet."})}
+const CUTQ=[
+ "If they could feel exactly how you see them for one minute, what do you think would surprise them most?",
+ "What's a moment with them you replay in your head when you're on your own, and why that one?",
+ "When did you love them most at a time they probably felt least lovable?",
+ "What part of you have you only ever shown them, and what made it feel safe enough?",
+ "What's something you want to promise them that you've never said out loud?"];
+const PRACTICE=["Practice: what did you have for breakfast today?","Practice: what's the best holiday you've ever had?","Practice: what's your go-to karaoke song?","Practice: cats or dogs, and why?","Practice: what's the last thing that made you laugh?"];
+const FINALE=["Turn and face each other. Tell them one thing you want the two of you to do together before you're old.","Hold hands. Each of you say the thing you're most grateful to them for this year.","Both of you: look at the camera and leave a message for the two of you watching this tomorrow morning."];
+function cutList(k){const c=S.cut,o=1-k,base=c.test?PRACTICE:CUTQ,list=base.slice();
+  if(!c.test)dk("cut").forEach(x=>list.push(x));
+  const sq=(c.sq[k]||"").trim();if(sq)list.push({secret:true,from:o,q:sq});
+  list.push({guess:true,q:`What do you think ${S.names[o]} said when asked: "${base[0]}"`});return list}
+function enterCut(test){stopTimers();ov=null;S.cutOn=true;S.cutAt=Date.now();if(!S.cut||S.cut.stage==="done"||(test!=null&&S.cut.test!==!!test&&S.cut.stage==="intro"))S.cut={stage:"intro",test:!!test,sq:["",""],order:[0,1],r:0,qi:0,shown:false};if(test!=null&&S.cut.stage==="intro")S.cut.test=!!test}
+function goTab(t){if(S.cutOn)exitCut();stopTimers();ov=null;
+  if(S.phase!=="setup"&&S.tab===S.mode&&t!==S.tab){if(S.mode==="board"&&S.phase==="board")S.bWasPlaying=true;if(S.mode==="h2h"&&["play","pick","gameover"].includes(S.phase))S.hWas=S.phase;S.phase="setup"}
+  S.tab=t;if(t==="h2h"||t==="board"){S.mode=t;if(S.phase==="setup"){if(t==="h2h"&&S.hWas){S.phase=S.hWas;S.hWas=null}else if(t==="board"&&S.bWasPlaying&&S.b){S.phase="board";S.bWasPlaying=false}}}
+  const m=$("main");if(m)m.scrollTop=0}
+function exitCut(){S.cutOn=false;if(S.b&&S.b.endAt&&S.cutAt)S.b.endAt+=Date.now()-S.cutAt;S.cutAt=null;if(S.cut&&S.cut.stage==="done")S.cut=null;toast(S.phase==="setup"?"Back to setup":"Back to the game")}
+function vCheck(){const ck=S.ck,step=ck.step;
+  if(step===4){const v=ck.v,lv=[0,1].map(k=>Math.round((v[k][0]+v[k][1])/2));
+    return `<div class="over"><div class="box"><div class="kick" style="color:var(--port)">Tipsy check</div><h2>Where you're at</h2>${[0,1].map(k=>`<div class="ckres"><div class="nm"><span class="tok t${k}">${esc(S.names[k][0]||"?")}</span>${N(k)}</div><div class="cklv">${lv[k]}<small>/10</small></div><div class="note">${esc(DLAB[lv[k]])} · said ${v[k][0]}, partner said ${v[k][1]} · app guess ${appGuess(k)}</div></div>`).join("")}
+    <p class="note">${S.drunk.unlocked?"The Cut is unlocked.":lv[0]>7&&lv[1]>7?"That's past 7 for both of you…":"The Cut unlocks when you're both past 7."}</p><button class="btn go w100" data-ck="done">Carry on</button></div></div>`}
+  const who=[0,1,1,0][step],about=[0,0,1,1][step],self=who===about;
+  return `<div class="over"><div class="box"><div class="kick" style="color:var(--port)">Tipsy check · ${step+1} of 4</div><h2>${self?`${N(who)}, how drunk are you?`:`${N(who)}, how drunk is ${N(about)}?`}</h2><div class="lvgrid">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button data-ck="v${n}"><b>${n}</b><span>${esc(DLAB[n])}</span></button>`).join("")}</div><button class="link" data-ck="skip">Skip the check for now</button></div></div>`}
+function ckClick(a){const ck=S.ck;if(a==="skip"){S.checkDue=false;S.ck=null;S.drunk.lastCheck=drinkTotal();return}if(a==="done")return finishCheck();
+  const n=+a.slice(1),step=ck.step,about=[0,0,1,1][step],slot=[0,1,0,1][step];ck.v[about][slot]=n;ck.step++}
+function vCut(){const c=S.cut,o=k=>1-k,A=c.order[c.r]||0,L=c.order[1-c.r]||1;
+  const banner=c.test?`<div class="testban">TEST RUN · practice questions only</div>`:"";
+  const wrap=(inner,btns)=>head(`<button class="btn ghost small" data-a="cutexit">${S.phase==="setup"?"Exit":"Back to game"}</button>`)+banner+`<div class="card cutcard"><div class="inner" id="inner">${inner}</div></div><div class="stack">${btns}</div>`;
+  if(c.stage==="intro")return wrap(`<div class="kick">The Cut</div><p class="big">Before you start</p><ol class="steps"><li>Prop the second phone up so it sees you both, and hit record in its normal camera app.</li><li>Whoever isn't answering puts earbuds in with music loud enough that they can't hear.</li><li>Each of you secretly writes one question for the other first.</li><li>Answer honestly. Either of you can veto a clip in the morning.</li></ol>`,
+    `${S.playlist?`<a class="btn ghost" href="${esc(S.playlist)}" target="_blank" rel="noopener">Open the playlist for the earbuds</a>`:""}<button class="btn go" data-cut="tosecret">${c.test?"Start test run":"We're recording, start"}</button><div class="row"><button class="btn ghost" data-cut="swaporder">${N(c.order[0])} answers first ⇄</button><button class="btn ghost" data-cut="toggletest">${c.test?"Switch to the real thing":"Do a test run instead"}</button></div>`);
+  if(c.stage==="secret0"||c.stage==="secret1"){const w=c.stage==="secret0"?1:0,t=o(w);
+    return wrap(`<div class="kick">Secret question · ${N(w)} writes for ${N(t)}</div><p class="big">${N(t)}, look away.</p><p class="hint">${N(w)}, write one question you want ${N(t)} to answer on camera. It stays hidden until they're answering.</p><textarea id="sqin" class="secret" placeholder="Your question for ${N(t)}">${esc(c.sq[t]||"")}</textarea>`,
+      `<button class="btn go" data-cut="${c.stage==="secret0"?"tosecret1":"toprep"}">Hide it, ${c.stage==="secret0"?`pass to ${N(t===0?1:0)}`:"let's go"}</button>`)}
+  if(c.stage==="prep")return wrap(`<div class="kick">Round ${c.r+1} of 2</div><p class="big">${N(A)} answers.</p><p class="hint">${N(L)}: earbuds in, music up, eyes off the screen. ${N(A)}: talk to the camera, not to them.</p>`,`<button class="btn go" data-cut="toq">${N(L)} can't hear. Go</button>`);
+  if(c.stage==="q"){const list=cutList(A),item=list[c.qi],txt=typeof item==="string"?item:item.q;
+    const label=typeof item==="string"?`Question ${c.qi+1} of ${list.length}`:item.secret?`A secret question from ${N(item.from)}`:"Guess round";
+    return wrap(`<div class="kick">${N(A)} answering · ${esc(label)}</div><p class="big qtxt ${c.shown?"":"blur"}" data-cut="reveal">${esc(txt)}</p><p class="hint">${c.shown?"Take your time. Say it to the camera.":"Tap the question when you're ready to see it."}</p>`,
+      `<button class="btn go" data-cut="nextq">${c.qi+1<list.length?"Next question":c.r===0?`Done. Swap to ${N(L)}`:"Done. Finale"}</button>`)}
+  if(c.stage==="finale")return wrap(`<div class="kick">Finale · both of you · earbuds out</div><p class="big">${esc(FINALE[c.qi])}</p><p class="hint">${c.qi+1} of ${FINALE.length}</p>`,`<button class="btn go" data-cut="nextf">${c.qi+1<FINALE.length?"Next":"Cut. That's a wrap"}</button>`);
+  if(c.stage==="done")return wrap(`<div class="kick">That's a wrap</div><p class="big">${c.test?"Test run done. The real questions are still hidden.":"Stop recording. Don't watch it tonight."}</p><p class="hint">${c.test?"When you're both past 7, the real Cut unlocks.":"Tomorrow, open Morning after from the setup screen and watch it together with coffee."}</p>`,`<button class="btn go" data-a="cutexit">${S.phase==="setup"?"Back to setup":"Back to the game"}</button>`);
+}
+function cutClick(a){const c=S.cut;
+  const sqIn=$("sqin");if(sqIn&&(c.stage==="secret0"||c.stage==="secret1")){const t=c.stage==="secret0"?0:1;c.sq[t]=sqIn.value}
+  if(a==="swaporder"){c.order=[c.order[1],c.order[0]];return}
+  if(a==="toggletest"){c.test=!c.test;if(!c.test&&!S.drunk.unlocked){c.test=true;toast("The real Cut unlocks when you're both past 7")}return}
+  if(a==="tosecret"){c.stage="secret0";return}
+  if(a==="tosecret1"){c.stage="secret1";return}
+  if(a==="toprep"){c.stage="prep";c.r=0;return}
+  if(a==="toq"){c.stage="q";c.qi=0;c.shown=false;return}
+  if(a==="reveal"){c.shown=true;return}
+  if(a==="nextq"){const list=cutList(c.order[c.r]);if(c.qi+1<list.length){c.qi++;c.shown=false;return}
+    if(c.r===0){c.r=1;c.stage="prep";return}c.stage="finale";c.qi=0;return}
+  if(a==="nextf"){if(c.qi+1<FINALE.length){c.qi++;return}c.stage="done";
+    if(!c.test){S.drunk.used=true;S.cutDone={when:Date.now(),rounds:c.order.map(k=>({k,list:cutList(k).map(x=>typeof x==="string"?{q:x}:x)})),finale:FINALE.slice()}}sfx("go");return}}
+function vMorning(){const m=S.cutDone;if(!m)return"";const d=new Date(m.when);
+  const item=(x,i)=>`<li><span class="note">${x.secret?`Secret question from ${N(x.from)}`:x.guess?"Guess round":`Question ${i+1}`}</span><br>${esc(x.q)}</li>`;
+  return `<div class="over" data-a="close"><div class="box rules"><div class="kick" style="color:var(--port)">Filmed ${d.toLocaleDateString("en-IE",{weekday:"long",day:"numeric",month:"long"})}</div><h2>Morning after</h2><p class="note">Watch it together. Before each answer plays, the other person guesses what was said. Either of you can veto a clip, no questions asked.</p>
+  ${m.rounds.map((r,ri)=>`<h4>Round ${ri+1} · ${N(r.k)} answering</h4><ol class="mlist">${r.list.map(item).join("")}</ol>`).join("")}<h4>Finale · together</h4><ol class="mlist">${m.finale.map(q=>`<li>${esc(q)}</li>`).join("")}</ol>
+  <button class="btn go" data-a="close">Close</button></div></div>`}
+function drunkGraph(){const L=S.drunk.levels;if(L.length<2)return L.length?`<p class="note">Tipsy check: ${N(0)} ${L[0].l[0]}/10 · ${N(1)} ${L[0].l[1]}/10</p>`:"";
+  const W=280,H=90,x=i=>10+i*(W-20)/(L.length-1),y=v=>H-10-(v-1)*(H-20)/9,line=k=>L.map((e,i)=>`${x(i).toFixed(1)},${y(e.l[k]).toFixed(1)}`).join(" ");
+  return `<div class="dg"><span class="lbl">Drunk graph</span><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Tipsy levels through the night"><line x1="10" x2="${W-10}" y1="${y(7).toFixed(1)}" y2="${y(7).toFixed(1)}" stroke="var(--line)" stroke-dasharray="3 3"/><polyline points="${line(0)}" fill="none" stroke="#5aa9ff" stroke-width="2.5"/><polyline points="${line(1)}" fill="none" stroke="#ff7aa2" stroke-width="2.5"/></svg></div>`}
+/* =================== BACKUP =================== */
+function makeBackup(){const c=JSON.parse(JSON.stringify(S));delete c.undo;return "NAD1:"+btoa(unescape(encodeURIComponent(JSON.stringify(c))))}
+function readBackup(code){code=(code||"").trim().replace(/\s+/g,"");if(!code.startsWith("NAD1:"))throw new Error("bad");return JSON.parse(decodeURIComponent(escape(atob(code.slice(5)))))}
+function vBackup(){const code=S.bkCode||"";return `<div class="over"><div class="box"><h2>Backup</h2>
+  <p class="note">Your hidden cards, settings, scores and any game in progress, packed into one code. Hidden cards stay scrambled inside it.</p>
+  <button class="btn go" data-a="bkmake">${code?"Make a fresh backup":"Save backup"}</button>
+  ${code?`<textarea id="bkout" class="bkcode" readonly>${esc(code)}</textarea><button class="btn ghost" data-a="bkcopy">Copy code</button><p class="note">Paste it somewhere safe, like a note to yourself in Notes or WhatsApp.</p>`:""}
+  <div class="field"><label class="lbl" for="bkin">Restore from a code</label><textarea id="bkin" class="bkcode" placeholder="Paste a backup code here"></textarea></div>
+  <button class="btn red" data-a="bkrestore">${S.bkArm?"Tap again: this replaces everything on this device":"Restore"}</button>
+  <button class="btn ghost" data-a="bkclose">Close</button></div></div>`}
+let tr=null;
+const SWEET=["Nothing extra","a lap dance","a 1-minute massage","a striptease","5 spanks","a body shot","a love bite anywhere"];
+function vTrade(){const b=S.b,p=b.turn,o=1-p;
+  const chip=(k,list)=>`<button data-tr="${list}${k}" aria-pressed="${tr[list].includes(k)}">${esc(SQ[k].s)}${(b.lvl[k]||1)>1?` L${b.lvl[k]}`:""}${b.mort[k]?" (M)":""}</button>`;
+  if(tr.stage==="confirm"){const give=tr.g.map(k=>SQ[k].l),take=tr.t.map(k=>SQ[k].l);
+    const lineA=[...give,tr.cg?money(tr.cg):""].filter(Boolean).join(" + ")||"nothing",lineB=[...take,tr.ct?money(tr.ct):""].filter(Boolean).join(" + ")||"nothing";
+    return `<div class="over"><div class="box"><h2>${N(o)}, deal?</h2><p class="note" style="color:var(--cream);font-size:1rem">${N(p)} gives you <b>${esc(lineA)}</b>${tr.sw?` plus <b>${esc(SWEET[tr.sw])}</b>`:""}.</p><p class="note" style="color:var(--cream);font-size:1rem">You give ${N(p)} <b>${esc(lineB)}</b>.</p><div class="row"><button class="btn go" data-tr="accept">Deal</button><button class="btn red" data-tr="decline">No deal</button></div></div></div>`}
+  const step=(key,who)=>`<div class="bar"><span class="note" style="flex:1">${who} pays: <b style="color:var(--gold)">${money(tr[key])}</b></span><button class="btn ghost small" data-tr="${key}-">−£50</button><button class="btn ghost small" data-tr="${key}+">+£50</button></div>`;
+  return `<div class="over"><div class="box"><h2>Trade</h2><p class="note">${N(p)} builds the offer, then hands the phone to ${N(o)}.</p>
+  <div class="field"><span class="lbl">${N(p)} gives</span><div class="chips">${ownedBy(p).map(k=>chip(k,"g")).join("")||'<span class="note">No spots</span>'}</div></div>${step("cg",N(p))}
+  <div class="field"><span class="lbl">${N(p)} wants</span><div class="chips hot">${ownedBy(o).map(k=>chip(k,"t")).join("")||'<span class="note">No spots</span>'}</div></div>${step("ct",N(o))}
+  <div class="field"><span class="lbl">Sweetener from ${N(p)}</span><div class="chips">${SWEET.map((x,i)=>`<button data-tr="sw${i}" aria-pressed="${tr.sw===i}">${esc(x)}</button>`).join("")}</div></div>
+  <div class="row"><button class="btn go" data-tr="propose">Propose to ${N(o)}</button><button class="btn ghost" data-tr="cancel">Cancel</button></div></div></div>`}
+function doTrade(a){const b=S.b,p=b.turn,o=1-p;let m;
+  if((m=a.match(/^([gt])(\d+)$/))){const L=tr[m[1]],k=+m[2],i=L.indexOf(k);i>=0?L.splice(i,1):L.push(k);return}
+  if((m=a.match(/^(cg|ct)([+-])$/))){const who=m[1]==="cg"?p:o;tr[m[1]]=Math.max(0,Math.min(b.cash[who],tr[m[1]]+(m[2]==="+"?50:-50)));return}
+  if((m=a.match(/^sw(\d+)$/))){tr.sw=+m[1];return}
+  if(a==="propose"){if(!tr.g.length&&!tr.t.length&&!tr.cg&&!tr.ct)return toast("Add something to the deal");tr.stage="confirm";return}
+  if(a==="cancel"){tr=null;ov=null;return}
+  if(a==="decline"){toast("No deal");tr.stage="build";return}
+  if(a==="accept"){tr.g.forEach(k=>b.own[k]=o);tr.t.forEach(k=>b.own[k]=p);give(p,o,tr.cg);give(o,p,tr.ct);sfx("cash");
+    logIt(`${S.names[p]} and ${S.names[o]} did a deal`);if(tr.sw)nag("forfeit",[p],`Deal sweetener: give ${S.names[o]} ${SWEET[tr.sw]}`);tr=null;ov=null;toast("Deal done")}}
+function vRecap(inline){const n=S.night,tot=k=>n.shots[k]+n.drinks[k],top=Object.entries(n.games).sort((a,b)=>b[1]-a[1])[0];
+  const light=tot(0)===tot(1)?"Dead even":`${S.names[tot(0)>tot(1)?0:1]}`,champ=n.wins[0]===n.wins[1]?"Nobody yet":S.names[n.wins[0]>n.wins[1]?0:1];
+  const row=(l,a,b)=>`<div class="rr"><span>${l}</span><b>${a}</b><b>${b}</b></div>`;
+  const open=inline?`<section class="panel recap"><div class="kick" style="color:var(--port)">Noite a Dois · tonight</div><h3 class="ph">Night recap</h3>`:`<div class="over" data-a="close"><div class="box recap"><div class="kick" style="color:var(--port)">Noite a Dois · tonight</div><h2>Night recap</h2>`;
+  return open+`
+  <div class="rr head"><span></span><b>${N(0)}</b><b>${N(1)}</b></div>${row("Shots",n.shots[0],n.shots[1])}${row("Drinks",n.drinks[0],n.drinks[1])}${row("Forfeits",n.forfeits[0],n.forfeits[1])}${row("Items stripped",n.strip[0],n.strip[1])}${row("Spanks owed",S.spank[0],S.spank[1])}${row("Wins",n.wins[0],n.wins[1])}${S.drunk.levels.length?row("Peak tipsy",Math.max(...S.drunk.levels.map(e=>e.l[0])),Math.max(...S.drunk.levels.map(e=>e.l[1]))):""}${drunkGraph()}
+  <div class="awards"><div><span class="lbl">Champion</span><b>${esc(champ)}</b></div><div><span class="lbl">Drank the most</span><b>${esc(light)}</b></div><div><span class="lbl">Most played</span><b>${top?esc(GAMES[top[0]]?GAMES[top[0]].name:top[0]):"—"}</b></div></div>
+  <p class="note">Screenshot it before you forget it.</p>${inline?`</section>`:`<div class="row"><button class="btn go" data-a="close">Close</button><button class="btn ghost" data-a="nightreset">${S.resetArm?"Tap again to reset":"Reset the night"}</button></div></div></div>`}`}
+/* =================== VIEWS =================== */
+const TABS=[["h2h","Head to Head","⚔"],["board","Board Game","▦"],["cut","The Cut","🎥"],["deck","Your Deck","✎"],["night","Tonight","☾"],["settings","Settings","⚙"]];
+const tabTitle=t=>(TABS.find(x=>x[0]===t)||TABS[0])[1];
+const head=extra=>{const live=S.phase!=="setup";const title=S.cutOn?"The Cut":live?tabTitle(S.mode):tabTitle(S.tab);
+  return `<div class="top"><h1 class="ptitle">${title}</h1><div class="bar">${live?`<button class="btn ghost small pausebtn" data-a="pause" aria-label="Pause">❚❚</button>`:""}${S.drunk&&S.drunk.unlocked&&live&&!S.cutOn?`<button class="btn red small" data-a="cutenter" aria-label="The Cut">🎥</button>`:""}${extra||""}<button class="btn ghost small" data-a="rules">Rules</button></div></div>`};
+function vNav(){const d=S.drunk,cur=S.cutOn?"cut":S.tab;
+  const badge=t=>{if(t==="h2h"&&(S.hWas||(S.mode==="h2h"&&S.phase!=="setup")))return `<i class="ndot live" title="Match in progress"></i>`;
+    if(t==="board"&&((S.bWasPlaying&&S.b)||(S.mode==="board"&&S.phase==="board")))return `<i class="ndot live" title="Game in progress"></i>`;
+    if(t==="cut")return d.unlocked&&!d.used?`<i class="ndot hot" title="Unlocked"></i>`:"";
+    if(t==="settings"&&S.bkDirty)return `<i class="ndot warn" title="Backup needed"></i>`;return ""};
+  const icon=t=>t==="cut"?(d.unlocked?"🎥":"🔒"):(TABS.find(x=>x[0]===t)||[])[2];
+  const score=(S.hWas||(S.mode==="h2h"&&S.phase!=="setup"))?`<div class="nscore"><span class="lbl">Match</span><b>${N(0)} ${S.games[0]}–${S.games[1]} ${N(1)}</b></div>`:(S.b&&((S.bWasPlaying)||(S.mode==="board"&&S.phase==="board")))?`<div class="nscore"><span class="lbl">Board</span><b>${money(S.b.cash[0])} · ${money(S.b.cash[1])}</b></div>`:"";
+  return `<div class="brand">Noite <span>a</span> Dois</div>${TABS.map(([t,l])=>`<button class="ntab" data-tab="${t}" aria-current="${cur===t?"page":"false"}"><span class="nic" aria-hidden="true">${icon(t)}</span><span class="nl">${l}</span>${badge(t)}</button>`).join("")}${score}`}
+function seg(key,vals,labels,cls){return `<div class="seg ${cls||""}" role="group">${vals.map((v,i)=>`<button data-set="${key}" data-v="${v}" aria-pressed="${S[key]==v}">${labels?labels[i]:v}</button>`).join("")}</div>`}
+const DKL=[["truth","Truths","Mixed into Truth or Drink, Trust Test and the board's Truth square (Flirty and Filthy)"],["dare","Dares","Mixed into Dare or Drink and the board's Dare square (Flirty and Filthy)"],["chance","Chance cards","Mixed into the board's Chance square"],["cut","Extra Cut questions","Asked after the main five in The Cut"]];
+const nudge=()=>S.bkDirty?`<div class="bknudge"><span>You've changed your hidden cards since the last backup.</span><button class="btn go small" data-a="bkopen">Save backup first</button></div>`:"";
+const sec=(title,inner)=>`<section class="panel"><h3 class="ph">${title}</h3>${inner}</section>`;
+function vSetup(){
+  if(S.tab==="board")return vBoardSetup();if(S.tab==="deck")return vDeckTab();if(S.tab==="cut")return vCutTab();if(S.tab==="night")return vNightTab();if(S.tab==="settings")return vSettings();return vH2HSetup()}
+function vH2HSetup(){
+  const grp=([g,label])=>`<div class="field"><div class="ghead"><span class="lbl">${label}</span><button class="link" data-only="${g}">Only these</button></div><div class="chips ${g==="sexy"?"hot":g}">${inGroup(g).map(k=>`<button data-tog="${k}" aria-pressed="${S.on.includes(k)}">${GAMES[k].name}</button>`).join("")}</div></div>`;
+  const start=S.hWas?`<button class="btn go" data-a="hresume">Resume match (${S.games[0]}–${S.games[1]})</button><button class="btn ghost" data-a="start">Start a new match</button>`:`<button class="btn go" data-a="start">Start the match</button>`;
+  return head()+`<p class="note">Mini-games, one round at a time. Win rounds to win games, win games to win the match.</p><div class="cols"><div class="stack">
+    ${sec("Match",`<div class="field"><span class="lbl">Heat</span>${seg("heat",[0,1,2],HEATS)}</div>
+    <div class="row"><div class="field"><span class="lbl">Points per game</span>${seg("toWin",[3,5,7])}</div><div class="field"><span class="lbl">Games to win</span>${seg("gamesToWin",[2,3,4])}</div></div>
+    <div class="field"><span class="lbl">Who picks the next game</span>${seg("pickMode",["random","choose"],["Random","Loser picks"])}</div>
+    <div class="field"><span class="lbl">Heat rises after every game</span>${seg("autoHeat",[0,1],["Off","On"])}</div>
+    <div class="field"><label class="lbl" for="gc">Loser of a game drinks</label><input type="text" id="gc" value="${esc(S.gameCost)}"></div>`)}
+    <div class="stack startbox">${nudge()}${start}</div></div>
+    <div class="stack">${sec(`Mini-games · ${S.on.length} of ${ORDER.length} on`,`${GROUPS.map(grp).join("")}<button class="btn ghost small" data-a="allon">Turn all ${ORDER.length} on</button>`)}</div></div>`}
+function vBoardSetup(){
+  const start=`${S.b&&S.bWasPlaying?`<button class="btn go" data-a="bresume">Resume current game</button><button class="btn ghost" data-a="bstart">Start a new board game</button>`:`<button class="btn go" data-a="bstart">Start the board game</button>`}`;
+  return head(`<button class="btn ghost small" data-a="guide">Guide</button>`)+`<p class="note">Sexy Monopoly with real money. Buy body parts, upgrade them, and make your partner pay rent in cash and in the bedroom. Bankrupt them to win.</p><div class="cols"><div class="stack">
+    ${sec("Game",`<div class="field"><span class="lbl">Game length</span>${seg("bLen",["quick","classic"],["Quick · about 45 min","Classic · no limit"])}<span class="note">${S.bLen!=="classic"?"£1,000 each, rent ×1.5, £100 for passing GO, and a 45-minute clock. When time's up, the richest wins.":"Pick your starting cash. Play until someone goes bankrupt."}</span></div>
+    <div class="row">${S.bLen==="classic"?`<div class="field"><span class="lbl">Starting cash</span>${seg("bCash",[1000,1500,2000],["£1,000","£1,500","£2,000"])}</div>`:""}<div class="field"><span class="lbl">Clothes each</span>${seg("bClothes",[3,5,7])}</div></div>`)}
+    ${sec("Layout",`<div class="field">${seg("boardSide",[0,1],["Stacked","Side by side"])}<span class="note">Side by side puts the board on the left and the cards, bank and log on the right. Best with the iPad turned sideways.</span></div>`)}</div>
+    <div class="stack">${sec("Ready?",`<div class="stack">${nudge()}${start}<button class="btn ghost" data-a="guide">Board guide: every square explained</button></div>`)}</div></div>`}
+function vDeckTab(){const dkCount=k=>`${(S.deck[k]||[]).length} hidden`;
+  return head()+`<p class="note">Type a card and tap Add. It's hidden straight away, and the app never shows who wrote which card. Whether you own up is your call.</p>${nudge()}<div class="cols">
+    ${DKL.map(([k,l,h])=>sec(`${l} · ${dkCount(k)}`,`<span class="note">${h}</span><div class="addrow"><input type="text" class="dkin secret" id="dk-${k}" data-dkin="${k}" autocomplete="off" placeholder="Type a ${l.toLowerCase().replace(/s$/,"").replace("extra cut question","Cut question")}"><button class="btn go small" data-dk="${k}">Add hidden</button></div>${(S.deck[k]||[]).length?`<div class="dkchips">${S.deck[k].map((x,i)=>`<span class="dkchip">●●●●<button data-dkdel="${k}:${i}" aria-label="Delete this hidden card">×</button></span>`).join("")}</div>`:""}`)).join("")}</div>`}
+function vCutTab(){const d=S.drunk,last=d.levels[d.levels.length-1];
+  return head()+`<div class="cols"><div class="stack">${sec(d.unlocked?"🎥 Unlocked":"🔒 Locked",`<p class="note" style="color:var(--cream);font-size:1rem">${d.unlocked?(d.used?"Filmed. Watch it tomorrow from Morning after.":"You're both past 7. Pause any game and film it."):"Unlocks when you're both past 7 on the tipsy check."}</p>${last?`<p class="note">Last tipsy check: ${N(0)} ${last.l[0]}/10 · ${N(1)} ${last.l[1]}/10</p>`:`<p class="note">No tipsy check yet. They pop up every few drinks during a game.</p>`}
+    <div class="stack">${d.unlocked?`<button class="btn red" data-a="cutenter">🎥 Open The Cut</button>`:""}<button class="btn ghost" data-a="cuttest">Test run (practice questions)</button>${S.cutDone?`<button class="btn go" data-a="morning">☀ Morning after</button>`:""}</div>`)}</div>
+    <div class="stack">${sec("How it works",`<ol class="steps light"><li>Prop the second phone up and hit record in its camera app.</li><li>You each secretly write one question for the other.</li><li>One answers while the other has earbuds in with music on, then you swap.</li><li>Five deep questions, the secret one, then a guess round.</li><li>Finale together, then watch it back in the morning.</li></ol>`)}</div></div>`}
+function vNightTab(){return head()+`<div class="cols"><div class="stack">${vRecap(true)}</div><div class="stack">${sec("Morning after",S.cutDone?`<button class="btn go" data-a="morning">☀ Open Morning after</button>`:`<p class="note">Film The Cut tonight and the question list for watching it back shows up here.</p>`)}${sec("Start fresh",`<button class="btn ghost" data-a="nightreset">${S.resetArm?"Tap again to reset the night":"Reset the night's stats"}</button>`)}</div></div>`}
+function vSettings(){
+  return head()+`<div class="cols"><div class="stack">
+    ${sec("Players",`<div class="row"><div class="field"><label class="lbl" for="n0">Player 1 · blue</label><input type="text" id="n0" value="${N(0)}"></div><div class="field"><label class="lbl" for="n1">Player 2 · pink</label><input type="text" id="n1" value="${N(1)}"></div></div><button class="link" data-a="swapp" style="align-self:flex-start">⇄ Swap players (keeps scores with the right person)</button>`)}
+    ${sec("Drinking",`<div class="field"><span class="lbl">Shot clock: you both take a shot every</span>${seg("shotEvery",[0,3,5,8],["Off","3 rounds","5 rounds","8 rounds"])}</div><div class="field"><label class="lbl" for="mc">Loser of the match drinks</label><input type="text" id="mc" value="${esc(S.matchCost)}"></div>`)}
+    ${sec("Backup",`${nudge()}<p class="note">Save a code with your hidden cards, settings and any game in progress. Restore it if Safari ever clears the app.</p><button class="btn ghost" data-a="bkopen">Backup and restore${S.bkDirty?" •":""}</button>`)}</div>
+    <div class="stack">${sec("Screen and sound",`<div class="field"><span class="lbl">Screen size</span>${seg("uiSize",[0,1,2],["Phone","iPad","iPad XL"])}</div><div class="field"><span class="lbl">Sound effects</span>${seg("sound",[1,0],["On","Off"])}</div>`)}
+    ${sec("Music",`<div class="field"><label class="lbl" for="pl">Afrobeats playlist link (Spotify)</label><div class="bar" style="flex-wrap:nowrap"><input type="text" id="pl" placeholder="Paste a https:// playlist link" value="${esc(S.playlist)}" style="flex:1"><button class="btn ghost small" data-a="plclear">Clear</button></div></div>`)}
+    ${sec("Help",`<button class="btn ghost" data-a="rules">Rules for ${tabTitle(S.mode)}</button>`)}</div></div>`}
+function vScore(){
+  const row=i=>`<div class="brow ${S.turn===i&&S.phase==="play"?"turn":""}"><span class="nm"><i></i>${N(i)}</span><span class="pips">${[...Array(S.toWin)].map((_,k)=>`<b class="${k<S.pts[i]?"on":""}"></b>`).join("")}</span><span class="g">${S.games[i]}</span></div>${["play","pick"].includes(S.phase)&&!S.sudden&&S.pts[1-i]-S.pts[i]>=3&&!S.cb[i]?`<div class="cbrow"><button class="btn red small" data-a="cb${i}">${N(i)}: use Comeback card, steal a point</button></div>`:""}`;
+  return head()+`<div class="board"><div class="bhead"><span>First to ${S.gamesToWin} games</span><span>Points</span><span>Games</span></div>${row(0)}${row(1)}
+  <div class="bank"><span>Spank Bank: ${N(0)} owes <b>${S.spank[0]}</b> · ${N(1)} owes <b>${S.spank[1]}</b></span><span>Drinks ${S.drinks[0]}–${S.drinks[1]}</span></div></div>
+  <div class="seg" role="group">${HEATS.map((h,i)=>`<button data-heat="${i}" aria-pressed="${S.heat===i}">${h}</button>`).join("")}</div>`;
+}
+function vPick(){return `<h2>${N(S.picker)} picks the next game</h2><div class="pick">${S.on.map(g=>`<button data-g="${g}" class="${GAMES[g].g}"><b>${GAMES[g].name}</b><span>${GAMES[g].short}</span></button>`).join("")}<button data-g="__random"><b>Surprise me</b><span>Random pick</span></button></div>`}
+const wins=(a,b,la,lb,cls)=>`<div class="row"><button class="btn ${cls?cls[0]:"go"}" data-w="${a}">${la}</button><button class="btn ${cls?cls[1]:"red"}" data-w="${b}">${lb}</button></div>`;
+const doOrDrink=(p,l)=>`<div class="row"><button class="btn go" data-w="${p}">${l||"Done it"}</button><button class="btn red" data-a="refuse">Drink instead</button></div>`;
+const kick=t=>`<div class="kick">${t}</div>`;
+const tm=t=>`<div class="timer" id="tm">${t}</div>`;
+function secretStage(r,viewer,intro,reveal,secretHtml,hint,timed,winA,winB,labA,labB){
+  if(r.stage===0)return[kick(intro[0])+`<p class="big">${intro[1]}</p><p class="hint">${intro[2]||""}</p>`,`<button class="btn go w100" data-a="reveal">${reveal}</button>`];
+  const I=kick(intro[0])+`<p class="big ${r.stage===2?"blur":""}" id="secret">${secretHtml}</p>${hint?`<p class="hint">${hint}</p>`:""}`+(timed?tm(r.t):"");
+  const A=timed&&r.stage===1?`<button class="btn go w100" data-a="clock">Start ${r.t}s</button>`:wins(winA,winB,labA,labB);
+  return[I,A];
+}
+function vPlay(){
+  const r=S.r,G=GAMES[r.g],p=r.p,o=1-p;let I="",A="";
+  switch(r.g){
+  case "truth":case "dare":I=kick(`${G.name} · ${N(p)}`)+`<p class="big">${esc(r.w)}</p>`;A=doOrDrink(p,r.g==="truth"?"Answered":"Done it");break;
+  case "trust":I=kick(`Trust Test · ${N(p)}`)+`<p class="big">${esc(r.w)}</p><p class="hint">Honest answer, or a shot.</p>`;A=`<div class="row"><button class="btn go" data-w="${p}">Answered honestly</button><button class="btn red" data-a="trustshot">Take a shot</button></div>`;break;
+  case "dice":I=kick(`Sexy Dice · ${N(p)} to ${N(o)}`)+`<div class="dice">${["Action","Where","How long"].map((l,i)=>`<div class="die"><small>${l}</small>${esc(r.d[i])}</div>`).join("")}</div>`;A=doOrDrink(p);break;
+  case "kroul":I=kick(`Kiss Roulette · ${N(p)} kisses ${N(o)}`)+`<div class="dice"><div class="die"><small>Where</small>${esc(r.d[0])}</div><div class="die"><small>How long</small>${esc(r.d[1])}</div></div>`;A=doOrDrink(p);break;
+  case "sroul":I=kick(`Body Shot Roulette · ${N(p)}`)+`<p class="big">Take a body shot off ${N(o)}'s ${esc(r.w)}.</p>`;A=`<div class="row"><button class="btn go" data-w="${p}">Done it</button><button class="btn red" data-a="refuse">Refuse + drink</button></div>`;break;
+  case "never":I=kick("Never have I ever")+`<p class="big">${esc(r.w.replace(/^Never have I ever /,"…"))}</p><p class="hint">Guilty drinks.</p>`;
+    A=`<div class="row"><button class="btn red" data-a="g0">Only ${N(0)} has</button><button class="btn red" data-a="g1">Only ${N(1)} has</button></div><div class="row"><button class="btn ghost" data-a="gboth">Both have</button><button class="btn ghost" data-a="redraw">Neither</button></div>`;break;
+  case "likely":I=kick("Most likely to · point on three")+`<p class="big">${esc(r.w)}</p>`;
+    A=`<div class="row"><button class="btn red" data-a="g0">It's ${N(0)}</button><button class="btn red" data-a="g1">It's ${N(1)}</button></div><button class="btn ghost" data-a="gboth">We disagree, both drink</button>`;break;
+  case "know":I=kick(`${N(p)} answers about ${N(o)}`)+`<p class="big">${esc(r.w)}</p>`;A=wins(p,o,"Right","Wrong");break;
+  case "blind":case "gkiss":[I,A]=secretStage(r,o,[G.name,`${N(p)}, close your eyes.`,`Hand the phone to ${N(o)}.`],`${N(o)}: show me`,esc(r.w),`${N(p)} guesses${r.g==="gkiss"?" what and where":" the spot"}.`,false,p,o,`${N(p)} got it`,"Wrong");break;
+  case "toetap":[I,A]=secretStage(r,o,["Toe Tap",`${N(p)}, close your eyes.`,`Hand the phone to ${N(o)}.`],`${N(o)}: show me`,`Touch their ${esc(r.w)}.`,`${N(p)} names the toe. Wrong? ${N(o)} sucks it.`,false,p,o,`${N(p)} got it`,`Wrong, suck it`);break;
+  case "draw":[I,A]=secretStage(r,o,["Draw on My Back",`${N(o)} draws. ${N(p)} guesses.`,`${N(p)}, turn around.`],`${N(o)}: show the word`,esc(r.w),`Trace it on ${N(p)}'s back. Right guess: ${N(o)} drinks. Wrong: ${N(p)} drinks.`,false,p,o,`${N(p)} got it`,`${N(p)} missed`);break;
+  case "hotcold":[I,A]=secretStage(r,o,["Hot or Cold",`${N(p)}, close your eyes.`,`Hand the phone to ${N(o)}.`],`${N(o)}: show the spot`,`Target: their ${esc(r.w)}`,`Guide ${N(p)} with hot or cold. They kiss the spot to win.`,true,p,o,`${N(p)} found it`,`Time's up, drink`);break;
+  case "flinch":I=kick(`Don't Flinch · ${N(o)} teases ${N(p)}`)+`<p class="big">${esc(r.w)}</p>`+tm(r.t);A=r.stage===1?`<button class="btn go w100" data-a="clock">Start 60s</button>`:wins(o,p,`${N(p)} flinched`,`${N(p)} survived`);break;
+  case "freeze":I=kick(`Freeze · ${N(o)} teases ${N(p)}`)+`<p class="big">${esc(r.w)}</p><div class="fz" id="fz">${r.fz>0?"FREEZE!":""}</div>`+tm(r.t);
+    A=r.stage===1?`<button class="btn go w100" data-a="clock">Start 60s</button>`:`<div class="row"><button class="btn red" data-a="frozefail">${N(p)} moved</button><button class="btn go" data-w="${p}">${N(p)} held</button></div>`;break;
+  case "simon":I=kick(`Sexy Simon Says · ${N(o)} reads to ${N(p)} · ${r.k+1} of 5`)+`<p class="big">${esc(r.cmd.x)}.</p><p class="hint">${r.cmd.s?"Simon said it, so do it.":"No 'Simon says'. Don't do it."}</p>`;
+    A=`<div class="row"><button class="btn go" data-a="simonok">${N(p)} got it right</button><button class="btn red" data-a="refuse">${N(p)} messed up</button></div>`;break;
+  case "ice":I=kick("Ice Cube Relay")+`<p class="big">Mouth to mouth, along the path: ${esc(r.w)}.</p><p class="hint">Take turns. Whoever drops it drinks.</p>`;A=`<div class="row"><button class="btn red" data-a="drop0">${N(0)} dropped it</button><button class="btn red" data-a="drop1">${N(1)} dropped it</button></div>`;break;
+  case "strivia":I=kick(`Strip Trivia · ${N(p)}`)+`<p class="big">${esc(r.q)}</p>${r.stage?`<p class="hint">Answer: <b>${esc(r.a)}</b></p>`:""}`;
+    A=(r.stage?"":`<button class="btn ghost w100" data-a="reveal">Show answer</button>`)+wins(p,o,"Right","Wrong, item off");break;
+  case "two":I=kick(`Two Truths & a Lie · ${N(p)}`)+`<p class="big">Topic: ${esc(r.w)}</p><p class="hint">${N(p)} says three things. ${N(o)} guesses the lie.</p>`;A=wins(o,p,`${N(o)} caught it`,`${N(o)} got fooled`);break;
+  case "stare":I=kick("Staring Contest")+`<p class="big">${esc(r.w)}</p><p class="hint">Who held on?</p>`;A=wins(0,1,`${N(0)} wins`,`${N(1)} wins`,["go","go"]);break;
+  case "lapdance":I=kick("Lap Dance Battle")+`<p class="big">One song each. ${N(p)} goes first.</p><p class="hint">Score each other out of 10. Tie: both drink and go again.</p>`;A=wins(0,1,`${N(0)} scored higher`,`${N(1)} scored higher`,["go","go"])+`<button class="btn ghost small" data-a="gboth">Tie, both drink</button>`;break;
+  case "danceoff":I=kick("Afrobeats Dance-off")+`<p class="big">30 seconds each. ${N(p)} goes first.</p><p class="hint">Score each other out of 10. Lower score drinks.</p>`;
+    A=`<div class="row"><button class="btn go" data-a="lose1">${N(0)} won</button><button class="btn go" data-a="lose0">${N(1)} won</button></div><button class="btn ghost small" data-a="gboth">Tie, both drink</button>`;break;
+  case "whine":I=kick("Whine Off")+`<p class="big">One full Afrobeats song. Whine on each other.</p><p class="hint">First to laugh or stop loses and drinks.</p>`;A=`<div class="row"><button class="btn red" data-a="lose0">${N(0)} broke</button><button class="btn red" data-a="lose1">${N(1)} broke</button></div>`;break;
+  case "hook":I=kick(`Finish the Hook · ${N(p)} sings`)+`<p class="big">${esc(r.song)}</p><p class="hint">${esc(r.artist)} · Sing the hook. ${N(o)}, check it on your phone.</p>`;A=`<div class="row"><button class="btn go" data-w="${p}">Got it right</button><button class="btn red" data-a="refuse">Wrong, drink</button></div><button class="btn ghost small" data-a="redraw">Don't know this one, new song</button>`;break;
+  case "tune":[I,A]=secretStage(r,o,["Name That Tune",`${N(o)} is the DJ. ${N(p)} guesses.`,`${N(p)}, no peeking.`],`${N(o)}: show the song`,`${esc(r.song)}`,`${esc(r.artist)}. Play the first 5 seconds on Spotify. ${N(p)} has 10 seconds to name it.`,false,p,o,`${N(p)} got it`,`Missed, drink`);
+    if(r.stage)A+=`<button class="btn ghost small" data-a="redraw">Can't find it, new song</button>`;break;
+  case "whosang":I=kick("Who Sang It · first to shout")+`<p class="big">${esc(r.song)}</p>${r.stage?`<p class="hint">It's <b>${esc(r.artist)}</b></p>`:""}`;
+    A=(r.stage?"":`<button class="btn ghost w100" data-a="reveal">Show artist</button>`)+wins(0,1,`${N(0)} got it`,`${N(1)} got it`,["go","go"])+`<button class="btn ghost small" data-a="redraw">Nobody got it, next</button>`;break;
+  case "cats":case "afrocats":{const nm=G.name;
+    if(r.stage===0){I=kick(nm)+`<p class="big">${esc(r.w)}</p><p class="hint">${N(p)} starts. 5 seconds each.</p>`;A=`<button class="btn go w100" data-a="catgo">Start</button>`}
+    else if(r.stage===1){I=kick(`${N(r.active)}'s go`)+`<p class="big">${esc(r.w)}</p>`+tm(r.t);A=`<button class="btn go w100" data-a="catpass" style="padding:22px">Said one, pass</button><button class="btn ghost small" data-a="catfail">${N(r.active)} repeated or got it wrong</button>`}
+    else{I=kick(nm)+`<p class="big">${N(r.active)} ran out.</p>`;A=`<button class="btn go w100" data-w="${1-r.active}">Point to ${N(1-r.active)}</button>`}break}
+  case "rps":{I=kick("Rock Paper Scissors · first to 2")+`<div class="tal"><span><b>${r.tal[0]}</b>${N(0)}</span><span><b>${r.tal[1]}</b>${N(1)}</span></div><p class="big" style="font-size:1.15rem">Stake: ${esc(r.stake)}${r.dbl?" ×2":""}</p><div class="cd" id="cd"></div><p class="hint">Night tally: ${N(0)} ${S.rpsNight[0]} – ${S.rpsNight[1]} ${N(1)}</p>`;
+    A=`<div class="row"><button class="btn ghost" data-a="shoot">Shoot</button><button class="btn ghost" data-a="dbl" ${r.dbl?"disabled":""}>${r.dbl?"Doubled":"Double it"}</button></div><div class="row"><button class="btn go" data-tal="0">${N(0)} won the hand</button><button class="btn go" data-tal="1">${N(1)} won the hand</button></div>`;break}
+  case "look":I=kick("Look Away · first to 3 catches")+`<div class="tal"><span><b>${r.tal[0]}</b>${N(0)}</span><span><b>${r.tal[1]}</b>${N(1)}</span></div><div class="cd" id="cd"></div><p class="hint">Rock paper scissors first. Winner points, loser turns their head on LOOK.</p>`;
+    A=`<button class="btn ghost w100" data-a="lookgo">Rock paper scissors, then LOOK</button><div class="row"><button class="btn go" data-tal="0">${N(0)} caught one</button><button class="btn go" data-tal="1">${N(1)} caught one</button></div>`;break;
+  case "slap":I=kick("Slap Hands · first to 3")+`<div class="tal"><span><b>${r.tal[0]}</b>${N(0)}</span><span><b>${r.tal[1]}</b>${N(1)}</span></div><p class="hint">Land a slap or catch a flinch to score. Swap hands after each one.</p>`;A=`<div class="row"><button class="btn go" data-tal="0">${N(0)} scores</button><button class="btn go" data-tal="1">${N(1)} scores</button></div>`;break;
+  case "thumb":I=kick("Strip Thumb War · first to 2 pins")+`<div class="tal"><span><b>${r.tal[0]}</b>${N(0)}</span><span><b>${r.tal[1]}</b>${N(1)}</span></div><p class="hint">One, two, three, four, I declare a thumb war. Every pin is an item off for the loser.</p>`;A=`<div class="row"><button class="btn go" data-tal="0">${N(0)} pinned</button><button class="btn go" data-tal="1">${N(1)} pinned</button></div>`;break;
+  case "combo":case "hilo":{const c=r.cur,other=r.sc[1-c];
+    const st=`<p class="hint">${N(c)}'s streak: <b>${r.n}</b>${other!=null?` · ${N(1-c)} set ${other}`:""}</p>`;
+    if(r.g==="combo"){I=kick(`Combo Caller · ${N(c)} throws`)+`<p class="big">${esc(r.cmb)}</p>`+st;A=`<div class="row"><button class="btn go" data-a="streakok">Nailed it</button><button class="btn red" data-a="streakfail">Messed up, drink</button></div>`}
+    else{const cd=r.card,red=cd.s===1||cd.s===2;I=kick(`Higher or Lower · ${N(c)}`)+`<div class="pcard ${red?"redsuit":""}">${CARD[cd.v]}${SUIT[cd.s]}</div>`+st;A=`<div class="row"><button class="btn go" data-a="hi">Higher</button><button class="btn go" data-a="lo">Lower</button></div>`}break}
+  case "bomb":
+    if(r.stage===0){I=kick("Bomb")+`<p class="big">${esc(r.w)}</p><p class="hint">${N(p)} starts holding it.</p>`;A=`<button class="btn red w100" data-a="bombgo">Light the fuse</button>`}
+    else if(r.stage===1){I=kick(`${N(r.holder)} is holding it`)+`<p class="big">${esc(r.w)}</p><div class="tick" aria-hidden="true">💣</div>`;A=`<button class="btn go w100" data-a="bombpass" style="padding:22px">Said one, pass</button>`}
+    else{I=kick("BOOM")+`<p class="big">${N(r.holder)} was holding it.</p>`;A=`<button class="btn go w100" data-a="bombend">Point to ${N(1-r.holder)}, ${N(r.holder)} drinks</button>`}break;
+  case "quick":
+    if(r.qs==="done"){I=kick("Quick Draw")+`<p class="big">${esc(r.res)}</p>`;A=`<button class="btn go w100" data-w="${r.qw}">Point to ${N(r.qw)}</button>`}
+    else{const sig=r.qs==="ready"?"Thumbs ready":r.qs==="wait"?"Wait for it…":"TAP!";
+      return `<div class="qd ${r.qs==="go"?"go":""}"><button class="flipme" data-q="1">${N(1)}</button><div class="sig">${sig}</div><button data-q="0">${N(0)}</button></div>`+(r.qs==="ready"?`<button class="btn go w100" data-a="qstart">Start</button>`:"")+`<p class="note"><b>${G.name}:</b> ${G.rule}</p>`+tools()}
+    break;
+  case "charades":case "sentence":{const who=r.g==="charades"?"acts":"describes";
+    [I,A]=secretStage(r,p,[G.name,`${N(p)} ${who}. ${N(o)} guesses.`,`${N(o)}, look away.`],`Show ${N(p)}`,esc(r.w),r.stage===2?"Tap to peek again.":"",true,o,p,`${N(o)} got it`,"Time's up");break}
+  case "maths":case "gk":I=kick(`${G.name} · first to shout`)+`<p class="${r.g==="maths"?"huge":"big"}">${esc(r.q)}${r.g==="maths"?" = ?":""}</p>${r.stage?`<p class="hint">Answer: <b>${esc(r.a)}</b></p>`:""}`;
+    A=(r.stage?"":`<button class="btn ghost w100" data-a="reveal">Show answer</button>`)+wins(0,1,`${N(0)} got it`,`${N(1)} got it`,["go","go"])+`<button class="btn ghost small" data-a="redraw">Nobody got it, new one</button>`;break;
+  case "spell":[I,A]=secretStage(r,o,["Spelling Bee",`${N(p)} spells. ${N(o)} reads.`,`${N(p)}, no peeking.`],`${N(o)}: show the word`,esc(r.w),`Read it out to ${N(p)}. One go, no restarts.`,false,p,o,"Spelled right","Wrong");break;
+  case "hang":{const done=[...r.w].every(c=>c===" "||r.guessed.includes(c)),dead=r.wrong>=6;
+    const shown=[...r.w].map(c=>c===" "?"&nbsp;":(r.guessed.includes(c)||dead?c:"_")).join(" ");
+    I=kick(`Hangman · ${N(p)} guesses`)+`<div class="word">${shown}</div><div class="lives">${[...Array(6)].map((_,k)=>`<b class="${k<r.wrong?"off":""}"></b>`).join("")}</div>`+
+      (done||dead?`<p class="big">${done?`${N(p)} solved it`:`${N(p)} got hanged`}</p>`:`<div class="keys">${"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map(l=>`<button data-l="${l}" ${r.guessed.includes(l)?"disabled":""} class="${r.guessed.includes(l)&&r.w.includes(l)?"hit":""}">${l}</button>`).join("")}</div>`);
+    if(done||dead)A=`<button class="btn go w100" data-w="${done?p:o}">Point to ${done?N(p):N(o)}</button>`;break}
+  case "ship":{const cnt=[0,1].map(i=>r.sunk.filter(x=>x===i).length),over=cnt[0]>=2||cnt[1]>=2;
+    I=kick("Battleship")+`<p class="hint">${over?"":`<b>${N(r.shooter)}</b> fires. Hit = go again.`}</p><div class="grid5">${r.occ.map((s,k)=>{const st=r.shot[k];const cls=!st?"":s<0?"miss":r.sunk[s]>=0?"sunk":"hit";return `<button data-c="${k}" class="${cls}" ${st||over?"disabled":""} aria-label="Square ${k+1}">${st?(s<0?"·":"✕"):""}</button>`}).join("")}</div><div class="tally"><span>${N(0)}: ${cnt[0]} sunk</span><span>${N(1)}: ${cnt[1]} sunk</span></div>`;
+    if(over){const w=cnt[0]>=2?0:1;A=`<button class="btn go w100" data-w="${w}">Point to ${N(w)}</button>`}break}
+  }
+  if(S.sudden)I=`<div class="kick" style="color:#c7305e;font-size:.9rem">Sudden death · winner takes the match</div>`+I;
+  return `<div class="card"><div class="inner" id="inner">${I}</div></div><div class="stack">${A}</div><p class="note"><b>${G.name}:</b> ${G.rule}</p>`+tools();
+}
+const tools=()=>`<div class="bar">${S.sudden?"":`<button class="btn red small" data-a="sudden">Sudden death</button>`}${S.playlist&&S.r&&GAMES[S.r.g]&&GAMES[S.r.g].g==="afro"?`<a class="btn ghost small" href="${esc(S.playlist)}" target="_blank" rel="noopener">Open playlist</a>`:""}<button class="btn ghost small" data-a="checknow">Tipsy check</button><button class="btn ghost small" data-a="newgame">Switch game</button><button class="btn ghost small" data-a="undo">Undo point</button><button class="btn ghost small" data-a="menu">Setup</button></div>`;
+function vGameOver(){const w=S.gw,l=1-w;return `<div class="card"><div class="inner"><div class="kick">Game to ${N(w)}, ${S.lastGame[0]}–${S.lastGame[1]}</div><p class="big">${N(l)}: ${esc(S.gameCost)}.</p><p class="hint"><b>Slave for 5:</b> ${N(w)} gets 5 minutes of total control over ${N(l)}, within your limits. Cash it in now or save it.</p><p class="hint">Games: ${N(0)} ${S.games[0]} – ${S.games[1]} ${N(1)}. First to ${S.gamesToWin} wins the match.</p></div></div><button class="btn go" data-a="continue">Next game</button>`}
+function vMatch(){const w=S.winner,l=1-w,rn=S.rpsNight;const rpsL=rn[0]+rn[1]>0&&rn[0]!==rn[1]?(rn[0]<rn[1]?0:1):-1;
+  return `<div class="card"><div class="inner"><div class="potion" aria-hidden="true">🧪</div><div class="kick">${N(w)} wins the match ${S.games[w]}–${S.games[l]}</div><p class="big">${N(l)}, it's time. ${esc(S.matchCost)}, all of it.</p><p class="hint">${N(w)} also names one forfeit for the rest of the night.</p>
+  <p class="hint"><b>Cash in the Spank Bank:</b> ${N(0)} takes ${S.spank[0]}, ${N(1)} takes ${S.spank[1]}.</p>${rpsL>=0?`<p class="hint"><b>RPS of the night:</b> ${N(rpsL)} lost ${rn[rpsL]}–${rn[1-rpsL]} and owes a full massage.</p>`:""}
+  <p class="hint">Drinks tonight: ${N(0)} ${S.drinks[0]} · ${N(1)} ${S.drinks[1]}</p></div></div><div class="row"><button class="btn go" data-a="rematch">Rematch</button><button class="btn ghost" data-a="menu">Setup</button></div><button class="btn ghost" data-a="recap">Night recap</button>`}
+
+function vBoard(){
+  const b=S.b,p=b.turn;
+  const cells=SQ.map((q,i)=>{const[rw,cl]=pos(i);const own=b.own[i];const corner=[0,8,16,24].includes(i);const kc=KIND[q.t]&&KIND[q.t][1];
+    const toks=[0,1].filter(k=>b.pos[k]===i).map(k=>`<span class="tok t${k} ${b.turn===k?"me":""}">${esc(S.names[k][0]||"?")}</span>`).join("");
+    const lvn=b.lvl[i]||1,lv=own!=null?`<span class="lvl">${b.mort[i]?"MORT":lvn===4?"●●●★":"●".repeat(lvn)}</span>`:"";
+    return `<div class="sq ${corner?"corner":""} ${q.t!=="p"?"spec":""} ${own!=null?"o"+own:""} ${b.mort[i]?"mort":""} ${b.pos[p]===i?"here":""}" data-sq="${i}" role="button" aria-label="${esc(q.l)}" style="grid-row:${rw};grid-column:${cl};${q.t!=="p"?`--k:${kc};`:""}">${q.g?`<span class="strip" style="background:${GRP[q.g]}"></span>`:""}${q.i?`<span class="ic">${q.i}</span>`:""}<span class="lab">${esc(q.s)}</span>${q.t==="p"&&own==null?`<span class="lvl">£${PRICE[q.g]}</span>`:lv}<span class="toks">${toks}</span></div>`}).join("");
+  let ctl="";
+  if(b.moving)ctl=`<div class="lbl">Moving…</div>`;
+  else if(b.stage==="roll"&&!b.card)ctl=`<button class="btn go" data-a="roll">${N(p)}: roll</button>`;
+  const center=`<div class="center"><div class="logo">Noite<br><span>a Dois</span></div><div class="dd ${b.spin?"spin":""}"><b>${b.dice[0]}</b><b>${b.dice[1]}</b></div>${ctl}<div class="lbl">${N(p)}'s turn${b.jail[p]?" · jailed":""}</div><div class="lbl" style="letter-spacing:.06em;text-transform:none">Tap any square to see what it does</div></div>`;
+  b.spin=false;
+  const clothes=i=>`<span class="cl" aria-label="${b.clothes[i]} items left">${[...Array(S.bClothes)].map((_,k)=>`<i class="${k<b.clothes[i]?"on":""}"></i>`).join("")}</span>`;
+  const badges=i=>[b.free[i]?`Rent Free ×${b.free[i]}`:"",b.rev[i]?`Reverse ×${b.rev[i]}`:"",b.blind[i]?`blindfolded (${b.blind[i]})`:""].filter(Boolean).join(" · ");
+  const leg=`<div class="pl">${[0,1].map(i=>`<div class="pc ${b.turn===i?"me":""}"><div class="nm"><span class="tok t${i}">${esc(S.names[i][0]||"?")}</span>${N(i)}</div><div class="cash">${money(b.cash[i])}</div><div class="ps">${ownedBy(i).length} spots · ${b.drinks[i]} drinks</div>${badges(i)?`<div class="ps">${badges(i)}</div>`:""}${clothes(i)}</div>`).join("")}</div>`;
+  const jail=b.stage==="jail"&&!b.card?`<div class="card"><div class="inner"><div class="kick">${N(p)} is in jail</div><p class="big">Take a shot or pay £50 bail.</p><p class="hint">Either way you roll straight away. Won't do either? You stay locked up and lose this turn.</p></div></div><div class="row"><button class="btn red" data-a="jailout">Take the shot, get out</button>${b.cash[p]>=50?`<button class="btn go" data-a="jailbail">Pay £50 bail</button>`:""}</div><button class="btn ghost" data-a="jailstay">Stay locked up</button>`:"";
+  const bankp=!b.card&&!b.moving?`<div class="bankp"><div class="lbl">Bank · ${N(p)}'s turn</div><div class="bar"><button class="btn ghost small" data-bk="earn">Earn £100 with a dare</button><button class="btn ghost small" data-bk="shop">Power shop</button><button class="btn ghost small" data-bk="trade">Trade</button><button class="btn ghost small" data-bk="mort">Mortgage</button></div><div class="bar"><button class="btn ghost small" data-bk="bar0" ${b.cash[0]<100?"disabled":""}>${N(0)}: buy ${N(1)} a shot · £100</button><button class="btn ghost small" data-bk="bar1" ${b.cash[1]<100?"disabled":""}>${N(1)}: buy ${N(0)} a shot · £100</button></div></div>`:"";
+  const log=b.log.length?`<div class="log">${b.log.map(l=>`<div>${esc(l)}</div>`).join("")}</div>`:"";
+  return head(`<button class="btn ghost small" data-a="guide">Guide</button>`)+`<div class="${S.boardSide?"bside":"bstack"}"><div class="bcol">`+leg+`<div class="jarline"><span>♥ Kiss Jar: <b>${b.jar}</b> kisses · <b>${money(b.jarCash)}</b></span><span>${b.endAt?`⏱ ${Math.max(0,Math.ceil((b.endAt-Date.now())/60000))} min left`:"Doubles = roll again"}</span></div><div class="bgrid">${cells}${center}</div></div><div class="bcol">`+jail+bankp+log+`<div class="bar"><button class="btn ghost small" data-a="checknow">Tipsy check</button><button class="btn ghost small" data-a="bend">End game now</button><button class="btn ghost small" data-a="menu">Setup</button></div></div></div>`;
+}
+function vCard(){const c=S.b.card,col=(KIND[c.kind]||KIND.p)[1];
+  return `<div class="over"><div class="gcard" style="--k:${col}"><div class="gtop"><span>${esc(c.sub||`${S.names[S.b.turn]} · rolled ${S.b.dice[0]+S.b.dice[1]} · ${money(S.b.cash[S.b.turn])}`)}</span><b>${esc(c.title)}</b></div>${c.bonus?`<div class="gbonus">${esc(c.bonus)}</div>`:""}<p class="gtext">${esc(c.text)}</p>${c.kind==="afro"&&S.playlist?`<div class="gsub"><a href="${esc(S.playlist)}" target="_blank" rel="noopener">Open your Afrobeats playlist</a></div>`:""}<div class="gbtns">${c.btns.map(([a,l,cl])=>`<button class="btn ${cl}" data-b="${a}">${esc(l)}</button>`).join("")}</div></div></div>`}
+function sqInfo(i){const q=SQ[i];
+  if(q.t!=="p")return{title:q.l,col:(KIND[q.t]||KIND.p)[1],text:SDESC[q.t],sub:""};
+  const b=S.b,own=b?b.own[i]:null,mates=SQ.filter(x=>x.g===q.g).map(x=>x.l).join(", "),ownerN=own!=null?S.names[own]:"The owner";
+  const set=own!=null&&b&&hasSet(i,own);
+  return{title:q.l,col:GRP[q.g],text:own!=null?`Owned by ${S.names[own]} · level ${b.lvl[i]||1}${set?" · full set":""}`:`For sale: ${money(PRICE[q.g])}`,
+    sub:`<b>${GRPNAME[q.g]} set:</b> ${esc(mates)}. Price ${money(PRICE[q.g])}, upgrades ${money(PRICE[q.g]/2)} per level. Own the whole set and rent doubles.<ol>${[1,2,3,4].map(l=>`<li>${l===4?"Penthouse":"Level "+l}: ${money(rentMoney(i,l,false))} + ${esc(rentAt(i,l,false,ownerN).toLowerCase())}</li>`).join("")}</ol>Penthouse costs ${money(PRICE[q.g])} to build. Mortgage it for ${money(PRICE[q.g]/2)} if you need cash.The visitor always pays the money. They can strip or drink 2 instead of the dirty bit.`}}
+function vInfo(i){const f=sqInfo(i);return `<div class="over" data-a="close"><div class="gcard" data-a="close" style="--k:${f.col}"><div class="gtop"><span>Board guide</span><b>${esc(f.title)}</b></div><p class="gtext" style="font-size:1.05rem">${esc(f.text)}</p>${f.sub?`<div class="gsub">${f.sub}</div>`:""}<div class="gbtns"><button class="btn go" data-a="close">Got it</button></div></div></div>`}
+function vGuide(){
+  const sets=Object.keys(GRP).map(g=>`<section><h3><span class="sw" style="background:${GRP[g]}"></span>${GRPNAME[g]} · ${money(PRICE[g])} each · upgrades ${money(PRICE[g]/2)}</h3>${SQ.map((q,i)=>q.g===g?`<p><b>${esc(q.l)}</b> · L1 ${money(RENTM[g][0])}: ${esc(rentAt(i,1,false,"The owner"))}. L2 ${money(RENTM[g][1])}: ${esc(rentAt(i,2,false,"The owner"))}. L3 ${money(RENTM[g][2])}: ${esc(rentAt(i,3,false,"The owner"))}. Penthouse ${money(rentMoney(i,4,false))}: ${esc(rentAt(i,4,false,"The owner"))}.</p>`:"").join("")}</section>`).join("");
+  const seen=new Set();const specials=SQ.filter(q=>q.t!=="p"&&!seen.has(q.t)&&seen.add(q.t)).map(q=>`<section><h3><span class="sw" style="background:${(KIND[q.t]||KIND.p)[1]}"></span>${esc(q.l)}</h3><p>${esc(SDESC[q.t])}</p></section>`).join("");
+  const bankS=`<section><h3>The bank</h3><p><b>Earn £100:</b> do a dare from the bank, any time on your turn. <b>Bartender:</b> pay £100 to make your partner take a shot. <b>Power shop:</b> Reverse Rent £200, Command £150, Rent Free £100. <b>Bribes:</b> on any forfeit, offer your partner £50, £100 or £200 to skip it. Rent money still gets paid.</p></section>`;
+  return `<div class="over" data-a="close"><div class="box rules" role="dialog" aria-label="Board guide"><h2>Board guide</h2><p class="note">Every square on the board. Times shown are base times; owning the full colour set doubles the rent money and the time.</p>
+  <h4>Corners and specials</h4>${specials}${bankS}<h4>Body part spots</h4>${sets}<button class="btn go" data-a="close">Close</button></div></div>`}
+function vRules(){
+  let body;
+  if(S.mode==="board")body=`<h2>Board game rules</h2>
+  <section><h3>Goal</h3><p>You each start with ${money(S.bCash||1500)}. Bankrupt your partner to win. End the game early and whoever's worth more (cash plus spots) wins. The loser drinks the ${esc(S.matchCost.toLowerCase())}.</p></section>
+  <section><h3>Moving</h3><p>Roll two dice and move. Doubles means roll again. Three doubles in a row sends you to jail. Pass GO and collect £200 (£100 in a quick game), plus a kiss anywhere you choose.</p></section>
+  <section><h3>Quick game</h3><p>£1,000 each, rent is 50% higher, and there's a 45-minute clock that stops while you're paused or filming The Cut. When time's up, whoever's worth more wins.</p></section>
+  <section><h3>Buying</h3><p>Land on an unowned spot and buy it at its price. Pass on it, or can't afford it, and it goes to auction: you both bid, highest bid wins.</p></section>
+  <section><h3>Rent</h3><p>Land on your partner's spot and you pay the rent money and do the dirty bit. You can strip or drink 2 instead of the dirty bit, but the money always gets paid. Naughtier spots cost more and earn more.</p></section>
+  <section><h3>Upgrades</h3><p>Land on your own spot to upgrade it, for half its price per level, up to level 3. Each level raises the rent money and makes the dirty bit filthier. At level 3 the owner decides. After that, build a Penthouse for the full price: bigger rent, and the visitor takes a shot too. Own a whole colour set and rent doubles.</p></section>
+  <section><h3>Trading</h3><p>On your turn, tap Trade. Swap spots and cash, and throw in a sweetener like a lap dance. Your partner says Deal or No deal.</p></section>
+  <section><h3>Mortgages</h3><p>Mortgage a spot for half its price any time on your turn. It earns no rent until you land on it and pay off 55% of the price.</p></section>
+  <section><h3>Big Spender</h3><p>First to £3,000 cash gets a striptease from their partner.</p></section>
+  <section><h3>Short on cash</h3><p>Do dares for £100 each, mortgage spots, or sell them back to the bank for half their value. Still can't pay? You're bankrupt and you lose.</p></section>
+  <section><h3>The bank</h3><p>On your turn you can earn £100 with a dare or visit the Power shop: Reverse Rent £200, Command £150, Rent Free £100. Either of you can pay £100 to make the other take a shot. On any forfeit you can offer a bribe of £50, £100 or £200 to skip it.</p></section>
+  <section><h3>Clothes</h3><p>You each start with ${S.bClothes} items. Strip Tax, rent and Chance take them off.</p></section>
+  <section><h3>Kiss Jar</h3><p>Every time someone drinks instead, a kiss and £50 go in the jar. Strip Tax and bail go in too. Land on the Kiss Jar corner and collect the lot.</p></section>
+  <section><h3>Jail</h3><p>Take a shot or pay £50 bail to get out and roll. Do neither and you lose the turn.</p></section>
+  <section><h3>Shot clock</h3><p>${S.shotEvery?`Every ${S.shotEvery} rounds, the screen flashes SHOT TIME and you both take one.`:"Off. Turn it on in setup."} Any time someone drinks, DRINK TIME flashes up.</p></section>
+  <section><h3>Every square</h3><p>Tap any square on the board, or open the Guide, to see prices, rent and what it does.</p></section>`;
+  else body=`<h2>Head to head rules</h2>
+  <section><h3>The match</h3><p>Each round is one mini-game. Win it, get a point. First to ${S.toWin} points wins a game and the loser drinks (${esc(S.gameCost.toLowerCase())}). First to ${S.gamesToWin} games wins the match and the loser drinks the ${esc(S.matchCost.toLowerCase())}.</p></section>
+  <section><h3>Shot time and drink time</h3><p>The screen flashes SHOT TIME or DRINK TIME whenever someone has to drink, so nobody forgets. Losing a game is a ${esc(S.gameCost.toLowerCase())}. ${S.shotEvery?`The shot clock makes you both take a shot every ${S.shotEvery} rounds.`:"The shot clock is off."}</p></section>
+  <section><h3>Comeback card</h3><p>Behind by 3 or more points? Once per game you can steal a point from the leader.</p></section>
+  <section><h3>Sudden death</h3><p>Tap Sudden death any time. One quick round, and the winner takes the whole match.</p></section>
+  <section><h3>Heat rises</h3><p>Turn it on in setup and the heat goes up one level after every game, Clean to Flirty to Filthy.</p></section>
+  <section><h3>Slave for 5</h3><p>Whoever wins a game gets 5 minutes of total control over the loser, within your limits.</p></section>
+  <section><h3>Spank Bank</h3><p>Every point you lose adds a spank to your bank. Cash it all in when the match ends.</p></section>
+  <section><h3>Picking games</h3><p>Random mode picks for you. Loser-picks mode lets whoever lost the last round choose. The yellow dot shows whose turn it is.</p></section>
+  <section><h3>Heat</h3><p>Clean, Flirty or Filthy. Changes the sexy games, charades, sentences and hangman. Change it any time.</p></section>
+  ${GROUPS.map(([g,l])=>`<h4>${l}</h4>`+inGroup(g).map(k=>`<section><h3>${GAMES[k].name}</h3><p>${GAMES[k].rule}</p></section>`).join("")).join("")}`;
+  return `<div class="over" data-a="close"><div class="box rules" role="dialog" aria-label="Rules">${body}
+  <section><h3>Tipsy check</h3><p>Every few drinks the app asks how drunk you each are, 1 to 10. You rate yourself and each other, and the app shows its own guess.</p></section>
+  <section><h3>The Cut</h3><p>Once you're both past 7, The Cut unlocks. Pause any game, film a private interview on your second phone while the other wears earbuds, then go back to the game exactly where you left it. Watch it the next morning from Morning after on the setup screen.</p></section>
+  <section><h3>House rules</h3><p>Can't agree who won? Both drink and replay. Anyone can pass on anything, no questions, and just drinks instead.</p></section>
+  <button class="btn go" data-a="close">Got it</button></div></div>`;
+}
+
+function render(anim){
+  const A=$("app");{const z=[[16,560],[19,760],[22,940]][S.uiSize||0];const side=S.boardSide&&S.mode==="board"&&S.phase==="board"&&!S.cutOn;document.documentElement.style.fontSize=z[0]+"px";document.documentElement.style.setProperty("--wrap",(side?Math.round(z[1]*1.75):z[1])+"px")}
+  if(S.mode==="board"&&S.b&&S.phase==="board"){const b=S.b;b.big=b.big||[false,false];[0,1].forEach(k=>{if(!b.big[k]&&b.cash[k]>=3000){b.big[k]=true;logIt(`${S.names[k]} became a Big Spender`);nag("forfeit",[1-k],`Big Spender: ${S.names[k]} hit £3,000. Give them a striptease.`)}})}
+  if(inGame()&&!S.checkDue&&drinkTotal()-S.drunk.lastCheck>=CHECK_EVERY)startCheck();
+  $("nav").innerHTML=vNav();
+  if(S.cutOn)A.innerHTML=vCut();
+  else if(S.phase==="setup"||S.tab!==S.mode)A.innerHTML=vSetup();
+  else if(S.mode==="board")A.innerHTML=S.phase==="bover"?vBOver():vBoard();
+  else A.innerHTML=vScore()+(S.phase==="pick"?vPick():S.phase==="play"?vPlay():S.phase==="gameover"?vGameOver():vMatch());
+  let o="";if(ov==="pause")o=`<div class="over"><div class="box" style="text-align:center;align-items:center"><h2>Paused</h2><p class="note">Timers are stopped. Take your time.</p><button class="btn go w100" data-a="unpause">Resume</button></div></div>`;
+  else if(ov==="confirmEnd")o=`<div class="over"><div class="box" style="text-align:center"><h2>End the game now?</h2><p class="note">Whoever's worth more wins, and the loser drinks the ${esc(S.matchCost.toLowerCase())}.</p><div class="row"><button class="btn red" data-a="bendyes">Yes, end it</button><button class="btn ghost" data-a="close">Keep playing</button></div></div></div>`;
+  else if(ov==="sudden")o=`<div class="over"><div class="box" style="text-align:center"><h2>Sudden death?</h2><p class="note">One quick round. Whoever wins takes the whole match, and the loser drinks the ${esc(S.matchCost.toLowerCase())}.</p><div class="row"><button class="btn red" data-a="suddengo">Do it</button><button class="btn ghost" data-a="close">Not yet</button></div></div></div>`;
+  else if(ov==="trade"&&tr)o=vTrade();
+  else if(alertQ.length)o=vAlert();else if(S.checkDue&&S.ck&&inGame())o=vCheck();else if(ov==="recap")o=vRecap();else if(ov==="morning")o=vMorning();else if(ov==="backup")o=vBackup();else 
+  if(ov==="rules")o=vRules();else if(ov==="guide")o=vGuide();else if(ov&&ov.sq!=null)o=vInfo(ov.sq);
+  else if(S.mode==="board"&&S.phase==="board"&&S.b&&S.b.card&&!S.b.moving)o=vCard();
+  $("overlay").innerHTML=o;
+  const inner=$("inner");if(anim&&inner){inner.classList.remove("flip");void inner.offsetWidth;inner.classList.add("flip")}
+  const r=S.r;if(ov!=="pause"&&S.mode==="h2h"&&S.phase==="play"&&r){
+    if(r.stage===2&&r.t>0&&["charades","sentence","flinch","hotcold","freeze"].includes(r.g)&&!timer)runClock();
+    if((r.g==="cats"||r.g==="afrocats")&&r.stage===1&&!timer)runCat();
+    if(r.g==="bomb"&&r.stage===1&&!timer)runBomb();
+    if(r.g==="quick"&&r.qs==="wait"&&!qTimer)qTimer=setTimeout(()=>{qTimer=null;r.qs="go";r.goAt=Date.now();render()},1500+rnd(3500));
+  }
+}
+function vBOver(){const w=S.winner,b=S.b,wv=[0,1].map(worth);
+  const stats=`<p class="hint">Worth: ${N(0)} ${money(wv[0])} · ${N(1)} ${money(wv[1])}</p><p class="hint">Drinks: ${N(0)} ${b.drinks[0]} · ${N(1)} ${b.drinks[1]} · Clothes left: ${N(0)} ${b.clothes[0]} · ${N(1)} ${b.clothes[1]}</p>`;
+  const btns=`<div class="row"><button class="btn go" data-a="bstart">Play again</button><button class="btn ghost" data-a="menu">Setup</button></div><button class="btn ghost" data-a="recap">Night recap</button>`;
+  if(w<0)return head()+`<div class="card"><div class="inner"><div class="potion" aria-hidden="true">🧪</div><div class="kick">Dead heat</div><p class="big">Exactly the same worth. You both drink the ${esc(S.matchCost.toLowerCase())}.</p>${stats}</div></div>${btns}`;
+  const l=1-w;return head()+`<div class="card"><div class="inner"><div class="potion" aria-hidden="true">🧪</div><div class="kick">${S.bankrupt!=null?`${N(l)} went bankrupt`:S.timeUp?`Time's up · ${N(w)} is richer`:`${N(w)} is richer`}</div><p class="big">${N(w)} wins. ${N(l)}: ${esc(S.matchCost)}, all of it.</p><p class="hint">${N(w)} gets one wish, cashed in tonight.</p>${stats}</div></div>${btns}`}
+function runClock(){timer=setInterval(()=>{const r=S.r;if(!r){stopTimers();return}r.t--;
+  if(r.g==="freeze"){if(r.fz>0){r.fz--}else{r.nx--;if(r.nx<=0){r.fz=6;r.nx=5+rnd(8);buzz(250)}}const f=$("fz");if(f)f.textContent=r.fz>0?"FREEZE!":""}
+  const el=$("tm");if(el){el.textContent=Math.max(r.t,0);el.classList.toggle("low",r.t<=10)}
+  if(r.t<=0){clearInterval(timer);timer=null;const f=$("fz");if(f)f.textContent="";toast("Time's up");buzz(300)}save()},1000)}
+function runCat(){timer=setInterval(()=>{const r=S.r;r.t--;const el=$("tm");if(el){el.textContent=Math.max(r.t,0);el.classList.toggle("low",r.t<=2)}
+  if(r.t<=0){clearInterval(timer);timer=null;r.stage=2;save();render(true)}},1000)}
+function runBomb(){timer=setInterval(()=>{const r=S.r;r.fuse--;if(r.fuse<=0){clearInterval(timer);timer=null;r.stage=2;buzz([200,80,400]);sfx("bomb");save();render(true)}},1000)}
+
+/* =================== EVENTS =================== */
+document.addEventListener("input",e=>{const id=e.target.id;
+  if(id==="n0"||id==="n1")S.names[+id[1]]=e.target.value.trim()||("Player "+(+id[1]+1));
+  if(id==="gc")S.gameCost=e.target.value.trim()||"Shot";
+  if(id==="mc")S.matchCost=e.target.value.trim()||"Magic potion";
+  if(id==="mt")S.myTruth=e.target.value;if(id==="mch")S.myChance=e.target.value;if(id==="mcut")S.myCut=e.target.value;if(id==="sqin"&&S.cut){S.cut.sq[S.cut.stage==="secret0"?0:1]=e.target.value}if(id==="pl"){const v=e.target.value.trim();S.playlist=/^https:\/\//.test(v)?v:""}if(id==="md")S.myDare=e.target.value;save()});
+document.addEventListener("keydown",e=>{const el=e.target.closest&&e.target.closest("[data-dkin]");if(el&&e.key==="Enter"){e.preventDefault();const btn=document.querySelector(`[data-dk="${el.dataset.dkin}"]`);if(btn)btn.click()}});
+document.addEventListener("toggle",e=>{if(e.target.classList&&e.target.classList.contains("deck"))S.deckOpen=e.target.open},true);
+document.addEventListener("pointerdown",e=>{const b=e.target.closest("[data-q]");if(!b)return;const r=S.r;if(!r||r.g!=="quick")return;const k=+b.dataset.q;
+  if(r.qs==="wait"){stopTimers();r.qs="done";r.qw=1-k;r.res=`${S.names[k]} jumped the gun.`;save();render()}
+  else if(r.qs==="go"){r.qs="done";r.qw=k;r.res=`${S.names[k]} wins in ${Date.now()-r.goAt} ms.`;save();render()}});
+function tallyHit(k){const r=S.r,l=1-k;r.tal[k]++;
+  if(r.g==="rps"){S.rpsNight[k]++;if(/^Drink/.test(r.stake)){S.drinks[l]+=r.dbl?2:1;nag("drink",[l],r.dbl?"Double drink":"Lost the hand")}else nag("forfeit",[l],r.stake+(r.dbl?" (twice)":""));r.stake=one(STAKES);r.dbl=false}
+  if(r.g==="thumb")nag("forfeit",[l],"Take one item off");
+  if(r.tal[k]>=r.need)return award(k);save();render()}
+function streakEnd(){const r=S.r,c=r.cur;S.drinks[c]++;r.sc[c]=r.n;nag("drink",[c],`Streak over at ${r.n}`);
+  if(r.sc[1-c]==null){r.cur=1-c;r.n=0;r.cmb=combo(0);r.card=newCard();save();return render(true)}
+  if(r.sc[0]===r.sc[1]){nag("drink",[0,1],"Tied streaks. Go again.");S.drinks[0]++;S.drinks[1]++;return startRound(r.g)}
+  award(r.sc[0]>r.sc[1]?0:1)}
+document.addEventListener("click",e=>{
+  if(alertQ.length&&!["pause","confirmEnd","trade","sudden"].includes(ov)){if(e.target.closest("[data-a=cutgo]")){alertQ=alertQ.filter(x=>x.kind!=="unlock"&&x.kind!=="remind");enterCut(false);save();return render(true)}if(e.target.closest("[data-a=alertok]")){alertQ.shift();render()}return}
+  if(S.checkDue&&S.ck){const ckb=e.target.closest("[data-ck]");if(ckb){ckClick(ckb.dataset.ck);save();return render()}if(!e.target.closest("[data-a=pause]"))return}
+  {const cb=e.target.closest("[data-cut]");if(cb&&S.cutOn){cutClick(cb.dataset.cut);save();return render(cb.dataset.cut!=="reveal")}}
+  if(e.target.id==="secret"){e.target.classList.toggle("blur");return}
+  const sqEl=e.target.closest("[data-sq]");if(sqEl&&!S.b.moving){ov={sq:+sqEl.dataset.sq};return render()}
+  const b=e.target.closest("button,[data-a=close]");if(!b)return;const d=b.dataset;
+  if(d.a==="close"){if(e.target===b||b.tagName==="BUTTON"){ov=null;render()}return}
+  if(d.tab){goTab(d.tab);save();return render(true)}
+  if(d.mode){S.mode=d.mode;save();return render()}
+  if(d.set){S[d.set]=isNaN(+d.v)?d.v:+d.v;if(d.set==="deckBy")S.deckOpen=true;save();return render()}
+  if(d.only){S.on=inGroup(d.only);save();return render()}
+  if(d.tog){const i=S.on.indexOf(d.tog);if(i>=0){if(S.on.length===1)return toast("Keep at least one game");S.on.splice(i,1)}else S.on.push(d.tog);S.on.sort((a,c)=>ORDER.indexOf(a)-ORDER.indexOf(c));save();return render()}
+  if(d.heat!=null){S.heat=+d.heat;save();toast(HEATS[S.heat]+" mode");return render()}
+  if(d.g)return startRound(d.g==="__random"?randomGame():d.g);
+  if(d.w!=null){const r=S.r;let dr=null;
+    if(r){const w=+d.w,l=1-w;
+      if(["hotcold","tune","ice"].includes(r.g)&&l===r.p)dr=r.p;
+      if(r.g==="draw")dr=w===r.p?1-r.p:r.p;
+      if(r.g==="strivia"&&l===r.p)nag("forfeit",[r.p],"Take one item off");
+      if(r.g==="toetap"&&l===r.p)nag("forfeit",[1-r.p],`Suck ${S.names[r.p]}'s ${r.w}`)}
+    return award(+d.w,dr)}
+  if(d.tal!=null)return tallyHit(+d.tal);
+  if(d.l){const r=S.r;r.guessed.push(d.l);if(!r.w.includes(d.l))r.wrong++;save();return render()}
+  if(d.c!=null){const r=S.r,k=+d.c;if(r.shot[k])return;r.shot[k]=1;const s=r.occ[k];
+    if(s<0){r.shooter=1-r.shooter;toast("Miss")}else{if(r.occ.every((x,i)=>x!==s||r.shot[i])){r.sunk[s]=r.shooter;toast(`${S.names[r.shooter]} sank a ship!`)}else toast("Hit! Go again")}
+    save();return render()}
+  if(d.b){resolve(d.b);save();return render(true)}
+  if(d.dk){const el=$("dk-"+d.dk),v=el?el.value.trim():"";if(!v)return toast("Type something first");S.deck[d.dk].push({t:v});S.deckOpen=true;S.bkDirty=true;save();toast("Hidden card added");render();const n=$("dk-"+d.dk);if(n)n.focus();return}
+  if(d.dkdel){const [k,i]=d.dkdel.split(":");S.deck[k].splice(+i,1);S.bkDirty=true;S.deckOpen=true;save();toast("Card deleted");return render()}
+  if(d.bk){bank(d.bk);save();return render(true)}
+  if(d.tr){doTrade(d.tr);save();return render()}
+  const r=S.r;
+  switch(d.a){
+    case "rules":ov="rules";return render();
+    case "guide":ov="guide";return render();
+    case "allon":S.on=ORDER.slice();save();return render();
+    case "start":S.hWas=null;S.sudden=false;S.cb=[false,false];Object.assign(S,{rounds:0,pts:[0,0],games:[0,0],drinks:[0,0],spank:[0,0],rpsNight:[0,0],undo:[],turn:rnd(2),last:null,r:null});S.picker=S.turn;save();toast(`${S.names[S.turn]} goes first`);return nextRound();
+    case "reveal":r.stage=1;save();return render(true);
+    case "clock":r.stage=2;save();return render();
+    case "redraw":return startRound(r.g);
+    case "refuse":return award(1-r.p,r.p);
+    case "trustshot":S.drinks[r.p]++;nag("shot",[r.p],"Wouldn't answer the Trust Test");return award(1-r.p);
+    case "g0":case "g1":{const guilty=+d.a[1];return award(1-guilty,guilty)}
+    case "gboth":S.drinks[0]++;S.drinks[1]++;nag("drink",[0,1],"Both of you");return startRound(r.g);
+    case "lose0":case "lose1":{const l=+d.a[4];return award(1-l,l)}
+    case "drop0":case "drop1":{const l=+d.a[4];return award(1-l,l)}
+    case "frozefail":nag("forfeit",[r.p],"Take one item off");return award(1-r.p);
+    case "simonok":r.k++;if(r.k>=5)return award(r.p);r.cmd=simonCmd();save();return render(true);
+    case "catgo":r.stage=1;r.t=5;save();return render();
+    case "catpass":stopTimers();r.active=1-r.active;r.t=5;save();return render();
+    case "catfail":stopTimers();r.stage=2;save();return render(true);
+    case "bombgo":r.stage=1;r.fuse=15+rnd(31);save();return render();
+    case "bombpass":r.holder=1-r.holder;buzz(30);save();return render();
+    case "bombend":return award(1-r.holder,r.holder);
+    case "shoot":return countdown(["Rock","Paper","Scissors","SHOOT!"]);
+    case "lookgo":return countdown(["Rock","Paper","Scissors","SHOOT!","Point…","3","2","1","LOOK!"]);
+    case "dbl":r.dbl=true;save();return render();
+    case "streakok":r.n++;r.cmb=combo(r.n);save();return render(true);
+    case "hi":case "lo":{const old=r.card.v,nc=newCard();r.card=nc;if(nc.v===old){toast("Same card. Free pass.");save();return render(true)}
+      const ok=d.a==="hi"?nc.v>old:nc.v<old;if(ok){r.n++;save();return render(true)}return streakEnd()}
+    case "streakfail":return streakEnd();
+    case "qstart":r.qs="wait";save();return render();
+    case "newgame":stopTimers();S.phase="pick";S.picker=S.turn;S.r=null;save();return render(true);
+    case "undo":return undo();
+    case "menu":stopTimers();if(S.mode==="board"&&S.phase==="board")S.bWasPlaying=true;if(S.mode==="h2h"&&["play","pick","gameover"].includes(S.phase))S.hWas=S.phase;S.phase="setup";save();return render();
+    case "continue":return nextRound();
+    case "rematch":S.sudden=false;S.cb=[false,false];Object.assign(S,{rounds:0,pts:[0,0],games:[0,0],drinks:[0,0],spank:[0,0],rpsNight:[0,0],undo:[],turn:1-S.winner,r:null});S.picker=S.turn;save();return nextRound();
+    case "bstart":stopTimers();S.timeUp=false;S.mode="board";S.tab="board";S.b=newBoard();S.phase="board";S.bWasPlaying=false;save();toast(`${S.names[S.b.turn]} rolls first`);return render(true);
+    case "bresume":S.phase="board";S.bWasPlaying=false;save();return render();
+    case "roll":return roll();
+    case "jailout":S.b.jail[S.b.turn]=false;S.b.drinks[S.b.turn]++;nag("shot",[S.b.turn],"Jailbreak");logIt(`${S.names[S.b.turn]} took a shot to escape jail`);S.b.stage="roll";toast("Free. Roll.");save();return render();
+    case "jailbail":give(S.b.turn,"jar",50);S.b.jail[S.b.turn]=false;logIt(`${S.names[S.b.turn]} paid £50 bail`);S.b.stage="roll";toast("Bailed out. Roll.");save();return render();
+    case "jailstay":S.b.again=false;endTurn();save();return render(true);
+    case "bend":ov="confirmEnd";return render();
+    case "sudden":ov="sudden";return render();
+    case "suddengo":ov=null;S.sudden=true;return startRound(one(["quick","stare","gk","maths"]));
+    case "cb0":case "cb1":{const k=+d.a[2];S.cb[k]=true;S.pts[k]++;S.pts[1-k]=Math.max(0,S.pts[1-k]-1);sfx("cash");toast(`${S.names[k]} steals a point`);save();return render()}
+    case "plclear":S.playlist="";save();render();{const el=$("pl");if(el)el.focus()}return;
+    case "cutenter":if(!S.drunk.unlocked)return toast("Unlocks when you're both past 7");enterCut(false);save();return render(true);
+    case "cuttest":enterCut(true);save();return render(true);
+    case "cutexit":exitCut();save();return render(true);
+    case "checknow":startCheck();return render();
+    case "morning":ov="morning";return render();
+    case "bkopen":ov="backup";S.bkArm=false;return render();
+    case "bkclose":ov=null;S.bkArm=false;return render();
+    case "bkmake":S.bkCode=makeBackup();S.bkDirty=false;S.bkArm=false;save();toast("Backup made. Copy it somewhere safe");return render();
+    case "bkcopy":{const t=$("bkout");if(!t)return;const done=()=>toast("Copied");try{navigator.clipboard.writeText(t.value).then(done,()=>{t.focus();t.select();toast("Selected. Tap Copy in the menu")})}catch(err){t.focus();t.select();toast("Selected. Tap Copy in the menu")}return}
+    case "bkrestore":{const v=($("bkin")||{}).value||"";let data;try{data=readBackup(v)}catch(err){return toast("That code doesn't look right. Paste the whole thing")}
+      if(!S.bkArm){S.bkArm=true;S.bkPending=v;render();const n=$("bkin");if(n)n.value=v;return}
+      S=Object.assign(JSON.parse(JSON.stringify(DEF)),data);S.undo=[];S.bkArm=false;S.bkCode="";S.bkDirty=false;S.cutOn=false;if(S.b)S.b.moving=false;alertQ=[];ov=null;save();toast("Backup restored");return render(true)}
+    case "recap":ov="recap";S.resetArm=false;return render();
+    case "nightreset":if(!S.resetArm){S.resetArm=true;return render()}S.resetArm=false;S.night={shots:[0,0],drinks:[0,0],forfeits:[0,0],strip:[0,0],wins:[0,0],games:{}};S.spank=[0,0];S.drunk={levels:[],unlocked:false,used:false,lastCheck:0,rem:0};ov=null;save();toast("Fresh night");return render();
+    case "bendyes":ov=null;endBoard();save();return render(true);
+    case "pause":stopTimers();ov="pause";S.pausedAt=Date.now();return render();
+    case "unpause":ov=null;if(S.b&&S.b.endAt&&S.pausedAt)S.b.endAt+=Date.now()-S.pausedAt;S.pausedAt=null;save();return render();
+    case "hresume":S.phase=S.hWas;S.hWas=null;save();return render(true);
+    case "swapp":swapPlayers();save();return render();
+  }
+});
+let AC=null;function audio(){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume()}catch(e){}}
+function tone(f,d,type,t0,vol,f2){if(!AC)return;const t=AC.currentTime+(t0||0),o=AC.createOscillator(),g=AC.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(vol||.2,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d+.02)}
+function noise(d,vol){if(!AC)return;const n=AC.sampleRate*d,buf=AC.createBuffer(1,n,AC.sampleRate),c=buf.getChannelData(0);for(let i=0;i<n;i++)c[i]=(Math.random()*2-1)*(1-i/n);const src=AC.createBufferSource(),g=AC.createGain();g.gain.value=vol||.5;src.buffer=buf;src.connect(g).connect(AC.destination);src.start()}
+function sfx(k){if(!S.sound||!AC)return;try{
+  if(k==="shot"){tone(140,.5,"sawtooth",0,.25,60);tone(140,.5,"square",.25,.15,50)}
+  else if(k==="drink"){tone(660,.12,"triangle",0,.25);tone(880,.18,"triangle",.12,.25)}
+  else if(k==="forfeit"){[740,587,440].forEach((f,i)=>tone(f,.18,"square",i*.15,.12))}
+  else if(k==="cash"){tone(1320,.08,"square",0,.12);tone(1760,.25,"sine",.08,.2)}
+  else if(k==="bomb"){noise(.9,.7);tone(90,.8,"sawtooth",0,.3,30)}
+  else if(k==="dice"){for(let i=0;i<6;i++)tone(300+Math.random()*500,.03,"square",i*.06,.08)}
+  else if(k==="go"){[523,659,784,1047].forEach((f,i)=>tone(f,.15,"triangle",i*.09,.2))}
+  else if(k==="point"){tone(880,.1,"sine",0,.18)}
+}catch(e){}}
+let wl=null;function keepAwake(){audio();try{if(navigator.wakeLock&&(!wl||wl.released))navigator.wakeLock.request("screen").then(l=>{wl=l}).catch(()=>{})}catch(e){}}
+keepAwake();document.addEventListener("pointerdown",keepAwake,{passive:true});document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")keepAwake()});
+render();
+</script>
+
+<script>if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));</script>
+</body></html>
