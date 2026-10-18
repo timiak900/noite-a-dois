@@ -541,7 +541,13 @@ function startRound(g){
   S.night.games[g]=(S.night.games[g]||0)+1;
   S.r=r;S.phase="play";save();render(true);
 }
-const randomGame=()=>{let l=S.on.filter(g=>g!==S.last);if(!l.length)l=S.on;return one(l)};
+const randomGame=()=>{const h=S.gHist||[];let l=S.on.slice();
+  if(l.length>=3)l=l.filter(g=>g!==h[h.length-1]);            /* 3+ games: no straight repeats */
+  else l=l.filter(g=>!(h.length>=2&&h[h.length-1]===g&&h[h.length-2]===g)); /* 2 games: never 3 in a row */
+  if(!l.length)l=S.on;const g=one(l);S.gHist=h.concat(g).slice(-4);return g};
+function nextPlayer(){const c=S.turnCount=S.turnCount||[0,0];let p;
+  if(Math.abs(c[0]-c[1])>=2)p=c[0]<c[1]?0:1;else p=Math.random()<.5?0:1; /* random, but nobody gets more than 2 extra turns */
+  c[p]++;return p}
 function nextRound(){if(S.pickMode==="choose"){stopTimers();S.phase="pick";S.r=null;save();render(true)}else startRound(randomGame())}
 function award(w,drinkFor){
   stopTimers();
@@ -550,7 +556,7 @@ function award(w,drinkFor){
   if(dl.length)nag("drink",dl,"Lost the round");
   if(S.sudden){S.sudden=false;S.games[w]=Math.max(S.games[w]+1,S.gamesToWin);S.pts=[0,0];S.phase="match";S.winner=w;S.night.wins[w]++;sfx("go");save();return render(true)}
   sfx("point");
-  S.pts[w]++;S.spank[1-w]++;S.rounds=(S.rounds||0)+1;S.last=S.r?S.r.g:null;S.picker=1-w;S.turn=1-S.turn;toast(`Point to ${S.names[w]}`);
+  S.pts[w]++;S.spank[1-w]++;S.rounds=(S.rounds||0)+1;S.last=S.r?S.r.g:null;S.picker=1-w;S.turn=nextPlayer();toast(`Point to ${S.names[w]}`);
   const gameOver=S.pts[w]>=S.toWin;
   if(S.shotEvery&&S.rounds%S.shotEvery===0&&!gameOver){S.drinks[0]++;S.drinks[1]++}if(S.shotEvery&&S.rounds%S.shotEvery===0&&!gameOver)nag("shot",[0,1],`Shot clock: round ${S.rounds}. Everybody drinks.`);
   if(gameOver){const l=1-w;S.games[w]++;S.cb=[false,false];S.drinks[l]++;nag(isShot(S.gameCost)?"shot":"drink",[l],`Lost the game: ${S.gameCost}`);S.lastGame=[S.pts[w],S.pts[l]];S.pts=[0,0];
@@ -1158,7 +1164,7 @@ document.addEventListener("click",e=>{
     case "rules":ov="rules";return render();
     case "guide":ov="guide";return render();
     case "allon":S.on=ORDER.slice();save();return render();
-    case "start":S.hWas=null;S.sudden=false;S.cb=[false,false];Object.assign(S,{rounds:0,pts:[0,0],games:[0,0],drinks:[0,0],spank:[0,0],rpsNight:[0,0],undo:[],turn:rnd(2),last:null,r:null});S.picker=S.turn;save();toast(`${S.names[S.turn]} goes first`);return nextRound();
+    case "start":S.hWas=null;S.turnCount=[0,0];S.gHist=[];S.sudden=false;S.cb=[false,false];Object.assign(S,{rounds:0,pts:[0,0],games:[0,0],drinks:[0,0],spank:[0,0],rpsNight:[0,0],undo:[],turn:rnd(2),last:null,r:null});S.picker=S.turn;save();toast(`${S.names[S.turn]} goes first`);return nextRound();
     case "reveal":r.stage=1;save();return render(true);
     case "clock":r.stage=2;save();return render();
     case "redraw":return startRound(r.g);
